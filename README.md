@@ -1,7 +1,7 @@
 K2 Structural
 =============
 
-This repository contains a set of Grasshopper plugins for Kangaroo 2 calibration with regard to structural properties.
+This repository contains a set of customised Kangaroo2 grasshopper components with the scope of calibrating the goals with regard to structural properties.
 
 Building from source
 ====================
