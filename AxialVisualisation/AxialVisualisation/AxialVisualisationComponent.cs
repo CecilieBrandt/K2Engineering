@@ -28,6 +28,7 @@ namespace AxialVisualisation
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddNumberParameter("Axial stresses", "stressA", "The axial stresses", GH_ParamAccess.list);
+            pManager.AddLineParameter("Line", "ln", "The lines to display", GH_ParamAccess.list);
         }
 
         /// <summary>
