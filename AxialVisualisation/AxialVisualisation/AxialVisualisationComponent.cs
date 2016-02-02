@@ -27,8 +27,8 @@ namespace AxialVisualisation
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Axial stresses", "stressA", "The axial stresses", GH_ParamAccess.list);
             pManager.AddLineParameter("Line", "ln", "The lines to display", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Axial stresses", "stressA", "The axial stresses", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -36,8 +36,8 @@ namespace AxialVisualisation
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddColourParameter("Colour", "C", "The colour of the bar", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Linewidth", "w", "The line width of the bar in pixels", GH_ParamAccess.list);
+            //pManager.AddColourParameter("Colour", "C", "The colour of the bar", GH_ParamAccess.list);
+            //pManager.AddIntegerParameter("Linewidth", "w", "The line width of the bar in pixels", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -48,8 +48,11 @@ namespace AxialVisualisation
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
+            List<Line> lines = new List<Line>();
+            DA.GetDataList(0, lines);
+
             List<double> stresses = new List<double>();
-            DA.GetDataList(0, stresses);
+            DA.GetDataList(1, stresses);
 
 
             //Properties to calculate
