@@ -8,6 +8,12 @@ namespace AxialVisualisation
 {
     public class AxialVisualisationComponent : GH_Component
     {
+        //Lines, colours and thickness for previewing, declared as class properties
+        List<Line> lines;
+        List<Color> colours;
+        List<int> thickness;
+
+
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
         /// constructor without any arguments.
@@ -15,6 +21,8 @@ namespace AxialVisualisation
         /// Subcategory the panel. If you use non-existing tab or panel names, 
         /// new tabs/panels will automatically be created.
         /// </summary>
+        /// 
+
         public AxialVisualisationComponent()
             : base("AxialForceDisplay", "AxialDisplay",
                 "Visualise the axial forces with colour and line weight (blue=tension, green=neutral, red=compression)",
@@ -36,8 +44,7 @@ namespace AxialVisualisation
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            //pManager.AddColourParameter("Colour", "C", "The colour of the bar", GH_ParamAccess.list);
-            //pManager.AddIntegerParameter("Linewidth", "w", "The line width of the bar in pixels", GH_ParamAccess.list);
+ 
         }
 
         /// <summary>
@@ -48,7 +55,7 @@ namespace AxialVisualisation
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            List<Line> lines = new List<Line>();
+            lines = new List<Line>();
             DA.GetDataList(0, lines);
 
             List<double> stresses = new List<double>();
@@ -56,8 +63,8 @@ namespace AxialVisualisation
 
 
             //Properties to calculate
-            List<Color> colours = new List<Color>();
-            List<int> thickness = new List<int>();
+            colours = new List<Color>();
+            thickness = new List<int>();
 
             //Convert stresses to integers (significant digits) and map to colour simultaneously
             List<int> stressesInt = new List<int>();
@@ -121,9 +128,28 @@ namespace AxialVisualisation
             }
 
             //Output
-            DA.SetDataList(0, colours);
-            DA.SetDataList(1, thickness);
+            //DA.SetDataList(0, colours);
+            //DA.SetDataList(1, thickness);
         }
+
+
+        //Custom preview of lines with colours and thickness
+        public override void DrawViewportWires(IGH_PreviewArgs args)
+        {
+            base.DrawViewportWires(args);
+
+            if(lines.Count != 0)
+            {
+                for(int i=0; i<lines.Count; i++)
+                {
+                    args.Display.DrawLine(lines[i], colours[i], thickness[i]);
+                }
+
+            }
+
+        }
+
+
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.
