@@ -9,9 +9,9 @@ namespace AxialVisualisation
     public class AxialVisualisationComponent : GH_Component
     {
         //Lines, colours and thickness for previewing, declared as class properties
-        List<Line> lines;
-        List<Color> colours;
-        List<int> thickness;
+        private List<Line> lines;
+        private List<Color> colours;
+        private List<int> thickness;
 
 
         /// <summary>
@@ -60,6 +60,7 @@ namespace AxialVisualisation
 
             List<double> stresses = new List<double>();
             DA.GetDataList(1, stresses);
+
 
 
             //Properties to calculate
@@ -127,9 +128,6 @@ namespace AxialVisualisation
                 thickness.Add(tMap);
             }
 
-            //Output
-            //DA.SetDataList(0, colours);
-            //DA.SetDataList(1, thickness);
         }
 
 
@@ -137,14 +135,18 @@ namespace AxialVisualisation
         public override void DrawViewportWires(IGH_PreviewArgs args)
         {
             base.DrawViewportWires(args);
+            if (Hidden) { return; }             //if the component is hidden
+            if(Locked) { return; }              //if the component is locked
 
             if(lines.Count != 0)
             {
                 for(int i=0; i<lines.Count; i++)
                 {
-                    args.Display.DrawLine(lines[i], colours[i], thickness[i]);
+                    if(lines[i] != null)
+                    {
+                        args.Display.DrawLine(lines[i], colours[i], thickness[i]);
+                    }
                 }
-
             }
 
         }
