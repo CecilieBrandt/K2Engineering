@@ -166,25 +166,18 @@ namespace ElasticRodElement
                 Point3d P3 = p[PIndex[3]].Position;
                 Vector3d V01 = P1 - P0;
                 Vector3d V23 = P3 - P2;
+                Vector3d n = Vector3d.CrossProduct(-V01, V23);
 
+                //Calculate moment and bending stress
                 double moment = Move[0].Length * Weighting[0] * V01.Length;
                 double bendingStress = (moment * zDist) / inertia;
 
-                V01.Unitize();
-                V23.Unitize();
-
-                Plane pl = new Plane(P1, V01, V23);
-                Vector3d average = (-V01 + V23) / 2.0;
-
-                if (average.Length == 0.0 && Move[1].Length != 0.0)      //if the vectors are parallel and the move vector is non-zero then use the move vector to specify bending plane. This happens if the structure is straight and tries to maintain that state but is influenced by out-of-plane forces
-                {
-                    pl = new Plane(P1, V01, Move[1]);
-                    average = Move[1];
-                }
-
-                average.Unitize();
-                double rotation = Vector3d.VectorAngle(pl.YAxis, average);
-                pl.Rotate(rotation, pl.ZAxis);
+                //Calculate bending plane
+                Vector3d planeYAxis = (Move[1] + Move[2]) / 2.0;
+                Vector3d planeXAxis = Vector3d.CrossProduct(planeYAxis, n);
+                planeYAxis.Unitize();
+                planeXAxis.Unitize();
+                Plane pl = new Plane(P1, planeXAxis, planeYAxis);
 
                 //Output the particle index of the shared point between the two consecutive line segments, the bending plane, the moment [kNm] and the stress [MPa]
                 var Data = new Object[4];
