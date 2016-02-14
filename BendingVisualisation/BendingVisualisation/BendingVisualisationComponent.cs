@@ -10,6 +10,11 @@ namespace BendingVisualisation
 {
     public class BendingVisualisationComponent : GH_Component
     {
+        //Class properties
+        List<Color> colours;
+        List<Line> lines;
+
+
         /// <summary>
         /// Each implementation of GH_Component must provide a public 
         /// constructor without any arguments.
@@ -39,8 +44,7 @@ namespace BendingVisualisation
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "ln", "Line representing bendingstress level", GH_ParamAccess.list);
-            pManager.AddColourParameter("Colour", "C", "The colour of the bar", GH_ParamAccess.list);
+
         }
 
         /// <summary>
@@ -62,8 +66,8 @@ namespace BendingVisualisation
 
 
             //Remap stress values to colours and lines
-            List<Color> colours = new List<Color>();
-            List<Line> lines = new List<Line>();
+            colours = new List<Color>();
+            lines = new List<Line>();
 
             double colourMax = 4*255.0;
             double colourMin = 0.0;
@@ -127,11 +131,29 @@ namespace BendingVisualisation
             }
 
 
-            //Output
-            DA.SetDataList(0, lines);
-            DA.SetDataList(1, colours);
         }
-        
+
+
+        //Custom preview of lines with colours
+        public override void DrawViewportWires(IGH_PreviewArgs args)
+        {
+            base.DrawViewportWires(args);
+            if (Hidden) { return; }             //if the component is hidden
+            if (Locked) { return; }              //if the component is locked
+
+            if (lines.Count != 0)
+            {
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    if (lines[i] != null)
+                    {
+                        args.Display.DrawLine(lines[i], colours[i], 2);
+                    }
+                }
+            }
+
+        }
+
 
         /// <summary>
         /// Provides an Icon for every component that will be visible in the User Interface.
