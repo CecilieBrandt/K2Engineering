@@ -26,7 +26,8 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("PMeshWarp", "pMeshW", "The plankton mesh with the first edge in each triangle following the warp direction", GH_ParamAccess.item);
+            pManager.AddGenericParameter("PMesh", "pMesh", "A plankton mesh that represents the soap film", GH_ParamAccess.item);
+            pManager.AddCurveParameter("WarpPolylines", "warpPl", "Specify the warp polylines", GH_ParamAccess.list);
             pManager.AddNumberParameter("WarpStress", "warpStress", "The warp stress", GH_ParamAccess.item);
             pManager.AddNumberParameter("WeftStress", "weftStress", "The weft stress", GH_ParamAccess.item);
         }
@@ -37,6 +38,7 @@ namespace K2Structural
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddGenericParameter("SoapFilmGoals", "SF", "The soap film goals", GH_ParamAccess.list);
+            pManager.AddGenericParameter("GeodesicGoals", "GS", "A goal which pulls the vertices in the warp direction towards geodesic lines without affecting the membrane shape", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -45,27 +47,60 @@ namespace K2Structural
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            //INPUT
-            PlanktonMesh pMeshW = new PlanktonMesh();
-            DA.GetData(0, ref pMeshW);
+            //------------------------------------------------------------INPUT------------------------------------------------------------------------//
 
+            PlanktonMesh pMesh = new PlanktonMesh();
+            DA.GetData(0, ref pMesh);
+
+            //Test that the mesh is triangulated
+            for (int i = 0; i < pMesh.Faces.Count; i++)
+            {
+                int[] faceIndexes = pMesh.Faces.GetFaceVertices(i);
+                if (faceIndexes.Length != 3)
+                {
+                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The pMesh has to be triangulated");
+                }
+            }
+
+            //Convert from curve to polyline
+            List<Polyline> warpPl = new List<Polyline>();
+            List<Curve> warpCrvs = new List<Curve>();
+            DA.GetDataList(1, warpCrvs);
+
+            foreach (Curve crv in warpCrvs)
+            {
+                Polyline pl;
+                crv.TryGetPolyline(out pl);
+                warpPl.Add(pl);
+            }
+
+            //Stresses
             double warpStress = 0.0;
-            DA.GetData(1, ref warpStress);
+            DA.GetData(2, ref warpStress);
 
             double weftStress = 0.0;
-            DA.GetData(2, ref weftStress);
+            DA.GetData(3, ref weftStress);
 
 
-            //CALCULATE
+            //------------------------------------------------------------CALCULATE------------------------------------------------------------------------//
+
+            //Create warp aligned pMesh
+            List<int> warpIndexList = createWarpIndexListFromPolylines(pMesh, warpPl);
+            PlanktonMesh pMeshW = createWarpPMesh(pMesh, warpIndexList);
+
+            //Create K2 goals
             List<IGoal> soapFilmGoals = createSoapFilmGoals(pMeshW, warpStress, weftStress);
+            List<IGoal> geodesicGoals = createGStringGoals(pMeshW, warpStress * 1000.0, warpIndexList);
 
 
-            //OUTPUT
+            //------------------------------------------------------------OUTPUT------------------------------------------------------------------------//
+
             DA.SetDataList(0, soapFilmGoals);
+            DA.SetDataList(1, geodesicGoals);
         }
 
 
-        //METHODS
+        //------------------------------------------------------------K2 LIST OF GOALS------------------------------------------------------------------------//
 
         //Create a list of soap-film goals
         List<IGoal> createSoapFilmGoals(PlanktonMesh wPMesh, double warpStress, double weftStress)
@@ -81,23 +116,47 @@ namespace K2Structural
 
                 Point3d[] faceVerticesXYZ = new Point3d[3] { P0, P1, P2 };
 
-                GoalObject sf = new SoapFilmElement(faceVerticesXYZ, warpStress, weftStress);
+                GoalObject sf = new SoapFilmGoal(faceVerticesXYZ, warpStress, weftStress);
                 soapFilmGoals.Add(sf);
             }
 
             return soapFilmGoals;
         }
 
+        //Create a list of geodesic goals
+        List<IGoal> createGStringGoals(PlanktonMesh wPMesh, double gStrength, List<int> warpIndexList)
+        {
+            List<IGoal> gStringGoals = new List<IGoal>();
+
+            //run through all internal vertices
+            for (int i = 0; i < wPMesh.Vertices.Count; i++)
+            {
+                if (!wPMesh.Vertices.IsBoundary(i))
+                {
+                    Point3d cPt = new Point3d(wPMesh.Vertices[i].X, wPMesh.Vertices[i].Y, wPMesh.Vertices[i].Z);
+                    Point3d[] ptNeighbours = extractVertexNeighboursXYZ(wPMesh, i);
+                    int[] wIndexes = findWarpIndexes(wPMesh, i, warpIndexList);
+
+                    GoalObject gs = new GeodesicGoal(cPt, ptNeighbours, wIndexes, gStrength);
+                    gStringGoals.Add(gs);
+                }
+            }
+
+            return gStringGoals;
+        }
+
+
+        //------------------------------------------------------------K2 SOAP FILM GOAL------------------------------------------------------------------------//
 
         //K2 Soap film goal
-        public class SoapFilmElement : GoalObject
+        public class SoapFilmGoal : GoalObject
         {
             double sWarp;
             double sWeft;
             double[] angles;            //out of curiosity
 
             //NB! the array of points have to be sorted ccw in a face and with index 0 and 1 belonging to the edge in the warp direction
-            public SoapFilmElement(Point3d[] pts, double warpStress, double weftStress)
+            public SoapFilmGoal(Point3d[] pts, double warpStress, double weftStress)
             {
                 sWarp = warpStress;
                 sWeft = weftStress;
@@ -138,6 +197,7 @@ namespace K2Structural
                 double tensionBC = 0.0;
                 double tensionCA = 0.0;
 
+                //make sure to handle the case where tan(90) = infinity. Assumption of non-degenerate triangles and thus tan(0)=0 or tan(180)=0 will never happen
                 if (angleAB != Math.PI / 2.0)
                 {
                     tensionAB = (heightAB / 2.0) * (sWarp - sWeft) + (sWeft * AB.Length) / (2.0 * Math.Tan(angleAB));
@@ -162,9 +222,9 @@ namespace K2Structural
                 AB.Unitize();
                 BC.Unitize();
                 CA.Unitize();
-                Vector3d fA = AB * tensionAB + (-CA * tensionCA);
-                Vector3d fB = BC * tensionBC + (-AB * tensionAB);
-                Vector3d fC = CA * tensionCA + (-BC * tensionBC);
+                Vector3d fA = AB * Math.Abs(tensionAB) + (-CA * Math.Abs(tensionCA));           //make sure that the force is always a tension force even if the angle > PI/2
+                Vector3d fB = BC * Math.Abs(tensionBC) + (-AB * Math.Abs(tensionAB));
+                Vector3d fC = CA * Math.Abs(tensionCA) + (-BC * Math.Abs(tensionBC));
 
                 //Set vector direction and magnitude
                 Move[0] = fA;
@@ -185,6 +245,296 @@ namespace K2Structural
             }
 
         }
+
+
+        //------------------------------------------------------------K2 GEODESIC GOAL------------------------------------------------------------------------//
+
+        //Geodesic goal
+        public class GeodesicGoal : GoalObject
+        {
+            double gStrength;
+            int[] wIndexes;
+            int vertexValence;
+
+
+            //pNeighbours are sorted ccw around the center vertex. Warp indexes specify which two neighbour points are in the warp direction
+            public GeodesicGoal(Point3d pCenter, Point3d[] pNeighbours, int[] warpIndexes, double strength)
+            {
+                gStrength = strength;
+                wIndexes = warpIndexes;
+                vertexValence = pNeighbours.Length;
+
+                //One array with all points (first index is the center vertex)
+                Point3d[] positions = new Point3d[pNeighbours.Length + 1];
+                positions[0] = pCenter;
+                for (int i = 0; i < pNeighbours.Length; i++)
+                {
+                    positions[i + 1] = pNeighbours[i];
+                }
+
+                //Kangaroo2 properties
+                PPos = positions;
+                Move = new Vector3d[pNeighbours.Length + 1];
+                Weighting = new double[pNeighbours.Length + 1];        //Set weighting to zero for all the neighbour vertices
+
+                for (int j = 0; j < pNeighbours.Length + 1; j++)
+                {
+                    if (j == 0)
+                    {
+                        Weighting[j] = 1.0;
+                    }
+                    else
+                    {
+                        Weighting[j] = 0.0;
+                    }
+                }
+            }
+
+
+            public override void Calculate(List<KangarooSolver.Particle> p)
+            {
+                //Points
+                Point3d ptC = p[PIndex[0]].Position;
+                List<Point3d> ptNeighbours = new List<Point3d>();
+
+                for (int i = 0; i < vertexValence; i++)
+                {
+                    ptNeighbours.Add(p[PIndex[i + 1]].Position);
+                }
+
+                //Edge vectors
+                List<Vector3d> edgeVectors = new List<Vector3d>();
+                foreach (Point3d pt in ptNeighbours)
+                {
+                    edgeVectors.Add(pt - ptC);
+                }
+
+                List<Vector3d> edgeVectorsShift = new List<Vector3d>();
+                for (int j = 0; j < edgeVectors.Count; j++)
+                {
+                    int index = (j + 1) % edgeVectors.Count;
+                    edgeVectorsShift.Add(edgeVectors[index]);
+                }
+
+                //Face normals
+                List<Vector3d> faceNormals = new List<Vector3d>();
+                for (int k = 0; k < edgeVectors.Count; k++)
+                {
+                    Vector3d fN = 0.5 * Vector3d.CrossProduct(edgeVectors[k], edgeVectorsShift[k]);         //scaled according to the area of the triangle
+                    faceNormals.Add(fN);
+                }
+
+                //Vertex normal
+                Vector3d vN = new Vector3d(0, 0, 0);
+                foreach (Vector3d v in faceNormals)
+                {
+                    vN += v;
+                }
+                vN.Unitize();
+
+                //Resultant tension force from center vertex
+                Vector3d vForce = new Vector3d(0, 0, 0);
+                foreach (int i in wIndexes)
+                {
+                    Vector3d gString = edgeVectors[i];
+                    gString.Unitize();
+                    gString *= gStrength;
+                    Vector3d gcompN = Vector3d.Multiply(gString, vN) * vN;
+                    Vector3d gcompT = gString - gcompN;
+                    vForce += gcompT;
+                }
+
+                //Set move vectors
+                Move[0] = vForce;
+                for (int i = 0; i < vertexValence; i++)
+                {
+                    Move[i + 1] = new Vector3d(0, 0, 0);
+                }
+            }
+
+        }
+
+
+        //------------------------------------------------------------WARP ALIGNED PMESH------------------------------------------------------------------------//
+
+        //Create new plankton mesh from sorted face topology according to warp direction
+        PlanktonMesh createWarpPMesh(PlanktonMesh pMesh, List<int> warpIndexList)
+        {
+            PlanktonMesh pMeshW = new PlanktonMesh();
+
+            //Add vertices from original pMesh
+            for (int i = 0; i < pMesh.Vertices.Count; i++)
+            {
+                pMeshW.Vertices.Add(pMesh.Vertices[i].X, pMesh.Vertices[i].Y, pMesh.Vertices[i].Z);
+            }
+
+            //Add faces with new topology
+            for (int i = 0; i < pMesh.Faces.Count; i++)
+            {
+                int[] faceVerticesSorted = calcFaceVerticesOrder(pMesh, i, warpIndexList);
+                pMeshW.Faces.AddFace(faceVerticesSorted[0], faceVerticesSorted[1], faceVerticesSorted[2]);
+            }
+            return pMeshW;
+        }
+
+
+        //Sort face vertices according to warp direction
+        int[] calcFaceVerticesOrder(PlanktonMesh pMesh, int faceIndex, List<int> warpIndexList)
+        {
+            int[] faceVerticesSorted = new int[3];
+
+            int[] faceHalfedges = pMesh.Faces.GetHalfedges(faceIndex);
+            int halfedgeWarp = -1;
+            for (int i = 0; i < faceHalfedges.Length; i++)
+            {
+                int start = pMesh.Halfedges[faceHalfedges[i]].StartVertex;
+                int end = pMesh.Halfedges[pMesh.Halfedges[faceHalfedges[i]].NextHalfedge].StartVertex;
+
+                int wIndexStart = warpIndexList.IndexOf(start);
+                if (wIndexStart == 0)
+                {
+                    if (end == warpIndexList[wIndexStart + 1])
+                    {
+                        halfedgeWarp = faceHalfedges[i];
+                    }
+                }
+                else
+                {
+                    if (end == warpIndexList[wIndexStart + 1] || end == warpIndexList[wIndexStart - 1])
+                    {
+                        halfedgeWarp = faceHalfedges[i];
+                    }
+                }
+            }
+
+            if (halfedgeWarp == -1)
+            {
+                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Face " + faceIndex + " does not have a warp direction specified");
+            }
+            else
+            {
+                int index0 = pMesh.Halfedges[halfedgeWarp].StartVertex;
+                int index1 = pMesh.Halfedges[pMesh.Halfedges[halfedgeWarp].NextHalfedge].StartVertex;
+                int index2 = pMesh.Halfedges[pMesh.Halfedges[halfedgeWarp].PrevHalfedge].StartVertex;
+
+                faceVerticesSorted[0] = index0;
+                faceVerticesSorted[1] = index1;
+                faceVerticesSorted[2] = index2;
+            }
+
+            return faceVerticesSorted;
+        }
+
+
+        //Create one list of warp vertex indexes
+        List<int> createWarpIndexListFromPolylines(PlanktonMesh pMesh, List<Polyline> pl)
+        {
+            List<int> warpIndexes = new List<int>();
+
+            foreach (Polyline p in pl)
+            {
+                List<int> polyIndexes = convertPolyToMeshIndexes(pMesh, p);
+                foreach (int i in polyIndexes)
+                {
+                    warpIndexes.Add(i);
+                }
+                warpIndexes.Add(-1);            //to seperate between polylines
+            }
+            return warpIndexes;
+        }
+
+
+        //Convert polyline points to mesh indexes
+        List<int> convertPolyToMeshIndexes(PlanktonMesh pMesh, Polyline pl)
+        {
+            List<int> plIndexes = new List<int>();
+
+            List<Point3d> verticesXYZ = extractMeshVerticesXYZ(pMesh);
+            List<Point3d> polylinePts = new List<Point3d>();
+            for (int i = 0; i < pl.Count; i++)
+            {
+                polylinePts.Add(pl[i]);
+            }
+
+            foreach (Point3d pt in polylinePts)
+            {
+                int index = verticesXYZ.IndexOf(pt);
+
+                if (index == -1)
+                {
+                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Was not able to find point P(" + pt.X + "," + pt.Y + "," + pt.Z + ") amongst the vertices in the mesh");
+                }
+                else
+                {
+                    plIndexes.Add(index);
+                }
+            }
+
+            return plIndexes;
+        }
+
+
+        //Convert mesh vertices to verticesXYZ
+        List<Point3d> extractMeshVerticesXYZ(PlanktonMesh pMesh)
+        {
+            List<Point3d> verticesXYZ = new List<Point3d>();
+
+            for (int i = 0; i < pMesh.Vertices.Count; i++)
+            {
+                Point3d pt = new Point3d(pMesh.Vertices[i].X, pMesh.Vertices[i].Y, pMesh.Vertices[i].Z);
+                verticesXYZ.Add(pt);
+            }
+            return verticesXYZ;
+        }
+
+
+        //------------------------------------------------------------GEODESIC WARP INDEXES------------------------------------------------------------------------//
+
+        //Extract vertex neighbours
+        Point3d[] extractVertexNeighboursXYZ(PlanktonMesh pMesh, int vIndex)
+        {
+            Point3d[] vNeighboursXYZ = new Point3d[pMesh.Vertices.GetValence(vIndex)];
+
+            //Neighbours mesh info
+            int[] vNeighbours = pMesh.Vertices.GetVertexNeighbours(vIndex);
+
+            for (int i = 0; i < vNeighbours.Length; i++)
+            {
+                vNeighboursXYZ[i] = new Point3d(pMesh.Vertices[vNeighbours[i]].X, pMesh.Vertices[vNeighbours[i]].Y, pMesh.Vertices[vNeighbours[i]].Z);
+            }
+            return vNeighboursXYZ;
+        }
+
+        //Find the two indexes in the warpIndexList which correspond to the two neighbour vertices in the warp direction
+        int[] findWarpIndexes(PlanktonMesh pMesh, int vIndex, List<int> warpIndexList)
+        {
+            int[] wIndexes = new int[2];
+
+            //find center vertex in warp index list (every vertex has a warp direction)
+            int cIndexW = warpIndexList.IndexOf(vIndex);
+
+            //extract index+1 and index-1 (always works because only internal vertices are considered)
+            int v0IndexW = warpIndexList[cIndexW - 1];
+            int v1IndexW = warpIndexList[cIndexW + 1];
+
+            //find index of these two in vNeighbours
+            int[] vNeighbours = pMesh.Vertices.GetVertexNeighbours(vIndex);
+            int v0IndexN = Array.IndexOf(vNeighbours, v0IndexW);
+            int v1IndexN = Array.IndexOf(vNeighbours, v1IndexW);
+
+            if (v0IndexN != -1 && v1IndexN != -1)
+            {
+                wIndexes[0] = v0IndexN;
+                wIndexes[1] = v1IndexN;
+            }
+            else
+            {
+                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Not able to find warp direction within the neighbourhood of vertex " + vIndex);
+            }
+
+            return wIndexes;
+        }
+
 
 
         /// <summary>
