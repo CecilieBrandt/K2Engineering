@@ -73,6 +73,7 @@
     <Compile Include="AxialVisualisation.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="BendingVisualisation.cs" />
+    <Compile Include="Cable.cs" />
     <Compile Include="CastBarOutput.cs" />
     <Compile Include="CastRodOutput.cs" />
     <Compile Include="CastSupportOutput.cs" />

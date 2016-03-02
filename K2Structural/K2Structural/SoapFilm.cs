@@ -90,7 +90,7 @@ namespace K2Structural
 
             //Create K2 goals
             List<IGoal> soapFilmGoals = createSoapFilmGoals(pMeshW, warpStress, weftStress);
-            List<IGoal> geodesicGoals = createGStringGoals(pMeshW, warpStress * 1000.0, warpIndexList);
+            List<IGoal> geodesicGoals = createGStringGoals(pMeshW, warpStress * 100.0, warpIndexList);
 
 
             //------------------------------------------------------------OUTPUT------------------------------------------------------------------------//
@@ -198,17 +198,18 @@ namespace K2Structural
                 double tensionCA = 0.0;
 
                 //make sure to handle the case where tan(90) = infinity. Assumption of non-degenerate triangles and thus tan(0)=0 or tan(180)=0 will never happen
-                if (angleAB != Math.PI / 2.0)
+                int dec = 1;
+                if (Math.Round(angleAB, dec) != Math.Round(Math.PI / 2.0, dec))
                 {
                     tensionAB = (heightAB / 2.0) * (sWarp - sWeft) + (sWeft * AB.Length) / (2.0 * Math.Tan(angleAB));
                 }
 
-                if (angleBC != Math.PI / 2.0)
+                if (Math.Round(angleBC, dec) != Math.Round(Math.PI / 2.0, dec))
                 {
                     tensionBC = (sWeft * BC.Length) / (2.0 * Math.Tan(angleBC));
                 }
 
-                if (angleCA != Math.PI / 2.0)
+                if (Math.Round(angleCA, dec) != Math.Round(Math.PI / 2.0, dec))
                 {
                     tensionCA = (sWeft * CA.Length) / (2.0 * Math.Tan(angleCA));
                 }
@@ -232,9 +233,14 @@ namespace K2Structural
                 Move[2] = fC;
 
                 //angles
+                /*
                 angles[0] = Vector3d.VectorAngle(fA, BC);
                 angles[1] = Vector3d.VectorAngle(fB, CA);
                 angles[2] = Vector3d.VectorAngle(fC, AB);
+                */
+                angles[0] = angleAB;
+                angles[1] = angleBC;
+                angles[2] = angleCA;
             }
 
 
