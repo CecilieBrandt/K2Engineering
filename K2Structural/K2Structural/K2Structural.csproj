@@ -82,6 +82,7 @@
     <Compile Include="K2StructuralInfo.cs" />
     <Compile Include="MeshSelfweight.cs" />
     <Compile Include="MeshSnowLoad.cs" />
+    <Compile Include="MeshWindLoad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rod.cs" />
     <Compile Include="SoapFilm.cs" />
