@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="AxialVisualisation.cs" />
     <Compile Include="Bar.cs" />
+    <Compile Include="BarSelfweight.cs" />
     <Compile Include="BendingVisualisation.cs" />
     <Compile Include="Cable.cs" />
     <Compile Include="CastBarOutput.cs" />
