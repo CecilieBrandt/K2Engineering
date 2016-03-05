@@ -198,18 +198,18 @@ namespace K2Structural
                 double tensionCA = 0.0;
 
                 //make sure to handle the case where tan(90) = infinity. Assumption of non-degenerate triangles and thus tan(0)=0 or tan(180)=0 will never happen
-                int dec = 1;
-                if (Math.Round(angleAB, dec) != Math.Round(Math.PI / 2.0, dec))
+                //set tension force to zero if the angle is larger than 90 degrees
+                if (angleAB < Math.PI / 2.0)
                 {
                     tensionAB = (heightAB / 2.0) * (sWarp - sWeft) + (sWeft * AB.Length) / (2.0 * Math.Tan(angleAB));
                 }
 
-                if (Math.Round(angleBC, dec) != Math.Round(Math.PI / 2.0, dec))
+                if (angleBC < Math.PI / 2.0)
                 {
                     tensionBC = (sWeft * BC.Length) / (2.0 * Math.Tan(angleBC));
                 }
 
-                if (Math.Round(angleCA, dec) != Math.Round(Math.PI / 2.0, dec))
+                if (angleCA < Math.PI / 2.0)
                 {
                     tensionCA = (sWeft * CA.Length) / (2.0 * Math.Tan(angleCA));
                 }
@@ -223,9 +223,9 @@ namespace K2Structural
                 AB.Unitize();
                 BC.Unitize();
                 CA.Unitize();
-                Vector3d fA = AB * Math.Abs(tensionAB) + (-CA * Math.Abs(tensionCA));           //make sure that the force is always a tension force even if the angle > PI/2
-                Vector3d fB = BC * Math.Abs(tensionBC) + (-AB * Math.Abs(tensionAB));
-                Vector3d fC = CA * Math.Abs(tensionCA) + (-BC * Math.Abs(tensionBC));
+                Vector3d fA = AB * tensionAB + (-CA * tensionCA);
+                Vector3d fB = BC * tensionBC + (-AB *tensionAB);
+                Vector3d fC = CA * tensionCA + (-BC * tensionBC);
 
                 //Set vector direction and magnitude
                 Move[0] = fA;
