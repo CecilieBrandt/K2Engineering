@@ -14,7 +14,7 @@ namespace K2Structural
         public Load()
           : base("Load", "Load",
               "A K2 nodal load goal",
-              "K2Structural", "Load")
+              "K2Structural", "2 Load")
         {
         }
 

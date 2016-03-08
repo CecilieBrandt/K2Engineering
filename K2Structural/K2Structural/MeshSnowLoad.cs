@@ -14,7 +14,7 @@ namespace K2Structural
         public MeshSnowLoad()
           : base("MeshSnowLoad", "MSnow",
               "Calculate the snow load on a mesh",
-              "K2Structural", "Load")
+              "K2Structural", "2 Load")
         {
         }
 

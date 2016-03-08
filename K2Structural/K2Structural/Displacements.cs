@@ -14,7 +14,7 @@ namespace K2Structural
         public Displacements()
           : base("Displacements", "Displ",
               "Calculate the nodal displacements [mm]",
-              "K2Structural", "Results")
+              "K2Structural", "3 Results")
         {
         }
 

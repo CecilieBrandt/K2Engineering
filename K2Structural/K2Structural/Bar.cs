@@ -14,7 +14,7 @@ namespace K2Structural
         public Bar()
           : base("Bar", "Bar",
               "A goal that represents a bar element with axial stiffness only. It outputs the extended/shortened line geometry and stress value (- compression, + tension)",
-              "K2Structural", "Elements")
+              "K2Structural", "0 Elements")
         {
         }
 

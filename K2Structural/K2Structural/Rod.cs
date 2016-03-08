@@ -14,7 +14,7 @@ namespace K2Structural
         public Rod()
           : base("Rod", "Rod",
               "A goal that represents an elastic rod with bending stiffness only. It outputs the bending plane, bending moment [kNm] and the bending stress [MPa]",
-              "K2Structural", "Elements")
+              "K2Structural", "0 Elements")
         {
         }
 

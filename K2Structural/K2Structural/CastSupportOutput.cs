@@ -14,7 +14,7 @@ namespace K2Structural
         public CastSupportOutput()
           : base("CastSupportOutput", "SupportOutput",
               "Cast the output of the support goal",
-              "K2Structural", "Utility")
+              "K2Structural", "5 Utility")
         {
         }
 

@@ -17,7 +17,7 @@ namespace K2Structural
         public SoapFilm()
           : base("SoapFilm", "SoapFilm",
               "A K2 anisotropic soap film goal",
-              "K2Structural", "Elements")
+              "K2Structural", "0 Elements")
         {
         }
 

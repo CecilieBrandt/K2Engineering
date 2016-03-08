@@ -14,7 +14,7 @@ namespace K2Structural
         public Support()
           : base("Support", "Support",
               "A support with output of reaction force in kN",
-              "K2Structural", "Supports")
+              "K2Structural", "1 Supports")
         {
         }
 

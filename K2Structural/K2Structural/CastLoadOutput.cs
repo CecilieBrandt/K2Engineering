@@ -14,7 +14,7 @@ namespace K2Structural
         public CastLoadOutput()
           : base("CastLoadOutput", "LoadOutput",
               "Cast the output of the load goal",
-              "K2Structural", "Utility")
+              "K2Structural", "5 Utility")
         {
         }
 
