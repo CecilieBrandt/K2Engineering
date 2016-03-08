@@ -76,10 +76,13 @@
     <Compile Include="BendingVisualisation.cs" />
     <Compile Include="Cable.cs" />
     <Compile Include="CastBarOutput.cs" />
+    <Compile Include="CastLoadOutput.cs" />
     <Compile Include="CastRodOutput.cs" />
     <Compile Include="CastSupportOutput.cs" />
     <Compile Include="Displacements.cs" />
     <Compile Include="K2StructuralInfo.cs" />
+    <Compile Include="Load.cs" />
+    <Compile Include="LoadVisualisation.cs" />
     <Compile Include="MeshSelfweight.cs" />
     <Compile Include="MeshSnowLoad.cs" />
     <Compile Include="MeshWindLoad.cs" />
