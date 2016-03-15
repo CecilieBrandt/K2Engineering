@@ -101,7 +101,7 @@ namespace K2Structural
                     PPos[3] = LB.From;
                 }
                 Move = new Vector3d[4];       // Move is an array of vectors, one for each PPos
-                Weighting = new double[4] { E * I, E * I, E * I, E * I }; // Weighting is an array of doubles for how strongly the goal affects each point 
+                Weighting = new double[4] { E * I, E * I, E * I, E * I }; // Weighting is an array of doubles for how strongly the goal affects each point
 
                 //Other
                 lineA = LA;
@@ -136,6 +136,7 @@ namespace K2Structural
                 Vector3d n = Vector3d.CrossProduct(-V01, V23);
                 Vector3d shearA = Vector3d.CrossProduct(-V01, n);
                 Vector3d shearB = Vector3d.CrossProduct(V23, n);
+
                 shearA.Unitize();
                 shearB.Unitize();
 
@@ -149,7 +150,6 @@ namespace K2Structural
                 Move[1] = -shearA;
                 Move[2] = shearB;
                 Move[3] = -shearB;
-
             }
 
 
@@ -198,7 +198,7 @@ namespace K2Structural
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Rod;
             }
         }
 
