@@ -165,7 +165,7 @@ namespace K2Structural
                 Vector3d n = Vector3d.CrossProduct(-V01, V23);
 
                 //Calculate moment and bending stress
-                double moment = Move[0].Length * Weighting[0] * V01.Length;
+                double moment = Move[0].Length * Weighting[0] * V01.Length * 1e3;           //Units: [Nmm]
                 double bendingStress = (moment * zDist) / inertia;
 
                 //Calculate bending plane

@@ -23,7 +23,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Bars", "bars", "The bar elements [mm] with equal cross section properties", GH_ParamAccess.list);
+            pManager.AddLineParameter("Bars", "bars", "The bar elements [m] with equal cross section properties", GH_ParamAccess.list);
             pManager.AddNumberParameter("CrossSectionArea", "A", "The cross section area in [mm2]", GH_ParamAccess.item);
             pManager.AddNumberParameter("MaterialDensity", "rho", "The material density in [kg/m3]", GH_ParamAccess.item);
         }
@@ -88,7 +88,7 @@ namespace K2Structural
                 Vector3d edge = new Vector3d(ln.To - ln.From);
                 double length = edge.Length * 0.5;
 
-                Vector3d force = dir * length * area * rho * 1e-8;
+                Vector3d force = dir * length * area * 1e-6 * rho * 9.82;      //Units: [N]
 
                 nodalForces[indexStart] += force;
                 nodalForces[indexEnd] += force;

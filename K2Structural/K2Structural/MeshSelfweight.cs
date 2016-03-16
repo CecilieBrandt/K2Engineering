@@ -23,8 +23,8 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [mm]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Thickness", "t", "The thickness in [mm]", GH_ParamAccess.item);
+            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [m]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Thickness", "t", "The thickness in [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("MaterialDensity", "rho", "The material density in [kg/m3]", GH_ParamAccess.item);
         }
 
@@ -52,7 +52,6 @@ namespace K2Structural
 
             double rho = 0.0;
             DA.GetData(2, ref rho);
-            rho *= 1e-8;                // Density in [N/mm3]
 
 
             //Calculate
@@ -80,7 +79,7 @@ namespace K2Structural
 
                 //Selfweight
                 double vertexArea = calcVertexVoronoiArea(pMesh, i);
-                Vector3d qs = dir * vertexArea * thickness * rho;               // Magnitude in [N]
+                Vector3d qs = dir * vertexArea * thickness * rho * 9.82;               //Units: [N]
 
                 nodalLoads.Add(qs);
             }

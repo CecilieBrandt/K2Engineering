@@ -23,7 +23,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [mm]", GH_ParamAccess.item);
+            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("WindLoad", "Q", "The wind load in [kN/m2]", GH_ParamAccess.item, 1.0);
             pManager.AddVectorParameter("WindDirection", "dir", "The wind-direction", GH_ParamAccess.item);
         }
@@ -83,7 +83,7 @@ namespace K2Structural
 
                 //Wind load
                 double vertexArea = calcVertexVoronoiArea(pMesh, i);
-                Vector3d qw = normal * vertexArea * windload * 1e-3;               // Magnitude in [N]
+                Vector3d qw = normal * vertexArea * windload * 1e3;               //Units: [N]
 
                 nodalLoads.Add(qw);
             }

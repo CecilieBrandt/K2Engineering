@@ -55,6 +55,7 @@ namespace K2Structural
             for (int i = 0; i < initialPositions.Count; i++)
             {
                 Vector3d displ = finalPositions[i] - initialPositions[i];
+                displ *= 1000;
                 displSum.Add(displ);
             }
 

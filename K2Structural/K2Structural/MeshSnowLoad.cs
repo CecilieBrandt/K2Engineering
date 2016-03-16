@@ -23,7 +23,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [mm]", GH_ParamAccess.item);
+            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("SnowLoad", "Q", "The snow load in [kN/m2]", GH_ParamAccess.item);
         }
 
@@ -79,7 +79,7 @@ namespace K2Structural
                 Vector3d qs = new Vector3d(0, 0, 0);
                 if (!double.IsNaN(vertexArea))
                 {
-                    qs = dir * vertexArea * snowload * 1e-3;               // Magnitude in [N]
+                    qs = dir * vertexArea * snowload * 1e3;               //Units: [N]
                 }
 
 
