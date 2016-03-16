@@ -23,8 +23,8 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("LineA", "LnA", "Line representing the first segment [mm]", GH_ParamAccess.item);
-            pManager.AddLineParameter("LineB", "LnB", "Line representing the consecutive segment [mm]", GH_ParamAccess.item);
+            pManager.AddLineParameter("LineA", "LnA", "Line representing the first segment [m]", GH_ParamAccess.item);
+            pManager.AddLineParameter("LineB", "LnB", "Line representing the consecutive segment [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("E-Modulus", "E", "E-Modulus of the material [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Inertia", "I", "The moment of inertia [mm4]", GH_ParamAccess.item);
             pManager.AddNumberParameter("z-distance", "z", "The distance from the section axis to the extreme fiber [mm]", GH_ParamAccess.item);
@@ -94,14 +94,14 @@ namespace K2Structural
             public RodGoal(Line LA, Line LB, double E, double I, double z, int opt)
             {
                 //K2 requirements
-                PPos = new Point3d[4] { LA.From, LA.To, LB.From, LB.To };     // PPos must contain an array of the points this goal acts on
+                PPos = new Point3d[4] { LA.From, LA.To, LB.From, LB.To };
                 if (LA.To.CompareTo(LB.From) != 0)
                 {
                     PPos[2] = LB.To;
                     PPos[3] = LB.From;
                 }
-                Move = new Vector3d[4];       // Move is an array of vectors, one for each PPos
-                Weighting = new double[4] { E * I, E * I, E * I, E * I }; // Weighting is an array of doubles for how strongly the goal affects each point
+                Move = new Vector3d[4];
+                Weighting = new double[4] {E*I*1e-6, E*I*1e-6, E*I*1e-6, E*I*1e-6 };           //Units: [N*m2]
 
                 //Other
                 lineA = LA;
@@ -140,7 +140,7 @@ namespace K2Structural
                 shearA.Unitize();
                 shearB.Unitize();
 
-                double shearAVal = (2.0 * Math.Sin(currentAngle)) / (V01.Length * V03.Length);
+                double shearAVal = (2.0 * Math.Sin(currentAngle)) / (V01.Length * V03.Length);          //Units: [1/m2]
                 double shearBVal = (2.0 * Math.Sin(currentAngle)) / (V23.Length * V03.Length);
 
                 shearA *= shearAVal;
