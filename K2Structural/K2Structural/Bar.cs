@@ -13,7 +13,7 @@ namespace K2Structural
         /// </summary>
         public Bar()
           : base("Bar", "Bar",
-              "A goal that represents a bar element with axial stiffness only. It outputs the extended/shortened line geometry and stress value (- compression, + tension)",
+              "A goal that represents a bar element with axial stiffness only. It outputs the extended/shortened line geometry, the axial force and stress value (- compression, + tension)",
               "K2Structural", "0 Elements")
         {
         }
@@ -23,7 +23,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "Ln", "Line representing the bar element [mm]", GH_ParamAccess.item);
+            pManager.AddLineParameter("Line", "Ln", "Line representing the bar element [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("E-Modulus", "E", "E-Modulus of the material [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Area", "A", "Cross-section area [mm2]", GH_ParamAccess.item);
         }
@@ -33,7 +33,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("B", "Bar", "Bar element with stress output", GH_ParamAccess.item);
+            pManager.AddGenericParameter("B", "Bar", "Bar element with force and stress output", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace K2Structural
 
                 PPos = new Point3d[2] { L.From, L.To };
                 Move = new Vector3d[2];
-                Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght };
+                Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght };           // Units: [N/m]
             }
 
             public override void Calculate(List<KangarooSolver.Particle> p)
@@ -115,7 +115,7 @@ namespace K2Structural
                     factor = -1.0;
                 }
 
-                double force = factor * Weighting[0] * Move[0].Length;
+                double force = factor * Weighting[0] * Move[0].Length;          //Units: [N]
 
                 //output the start and end particle index, the extended/shortened line, the force in [kN] and the stress in [MPa]
                 var Data = new object[5] { PIndex[0], PIndex[1], new Line(p[PIndex[0]].Position, p[PIndex[1]].Position), force / 1000.0, force / area };

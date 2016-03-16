@@ -61,7 +61,7 @@ namespace K2Structural
             DA.SetData(0, pIndexStart);
             DA.SetData(1, pIndexEnd);
             DA.SetData(2, ln);
-            DA.SetData(3, Math.Round(force, 2));
+            DA.SetData(3, Math.Round(force, 3));
             DA.SetData(4, Math.Round(stress, 1));
         }
 

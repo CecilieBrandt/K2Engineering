@@ -23,7 +23,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "Ln", "Line representing the cable element [mm]", GH_ParamAccess.item);
+            pManager.AddLineParameter("Line", "Ln", "Line representing the cable element [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("E-Modulus", "E", "E-Modulus of the material [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Area", "A", "Cross-section area [mm2]", GH_ParamAccess.item);
             pManager.AddNumberParameter("PreTension", "P", "Optional pre-tension [kN]", GH_ParamAccess.item);
@@ -35,7 +35,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Cable", "Cable", "Cable element with stress output", GH_ParamAccess.item);
+            pManager.AddGenericParameter("Cable", "Cable", "Cable element with force and stress output", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -82,10 +82,10 @@ namespace K2Structural
 
                 PPos = new Point3d[2] { L.From, L.To };
                 Move = new Vector3d[2];
-                Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght }; 
+                Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght };           //Units: [N/m]
 
                 //Adjust restlenght if prestressed bar
-                restLenght -= (F * 1000 * restLenght) / (E * A);
+                restLenght -= (F * 1000 * restLenght) / (E * A);            //Units: [m]
             }
 
             public override void Calculate(List<KangarooSolver.Particle> p)
