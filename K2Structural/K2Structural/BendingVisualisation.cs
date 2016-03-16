@@ -31,7 +31,7 @@ namespace K2Structural
         {
             pManager.AddPlaneParameter("Bending planes", "pl", "The bending planes", GH_ParamAccess.list);
             pManager.AddNumberParameter("Bending stresses", "stressB", "The bending stresses", GH_ParamAccess.list);
-            pManager.AddNumberParameter("ScaleFactor", "sc", "The scale factor of the lines", GH_ParamAccess.item, 500);
+            pManager.AddNumberParameter("ScaleFactor", "sc", "The scale factor of the lines", GH_ParamAccess.item, 0.5);
         }
 
         /// <summary>

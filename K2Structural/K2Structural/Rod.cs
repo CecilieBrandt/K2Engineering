@@ -169,7 +169,7 @@ namespace K2Structural
                 double bendingStress = (moment * zDist) / inertia;
 
                 //Calculate bending plane
-                Vector3d planeYAxis = (Move[1] + Move[2]) / 2.0;
+                Vector3d planeYAxis = -(Move[1] + Move[2]) / 2.0;
                 Vector3d planeXAxis = Vector3d.CrossProduct(planeYAxis, n);
                 planeYAxis.Unitize();
                 planeXAxis.Unitize();

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
@@ -13,7 +13,7 @@ namespace K2Structural
         /// </summary>
         public Displacements()
           : base("Displacements", "Displ",
-              "Calculate the nodal displacements [mm]",
+              "Calculate the nodal displacements",
               "K2Structural", "3 Results")
         {
         }
@@ -32,7 +32,10 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddVectorParameter("TotalDisplacement", "dSum", "The total displacement of each node [mm]", GH_ParamAccess.list);
+            pManager.AddVectorParameter("TotalDisplacements", "vDispl", "The total displacement of each node [mm]", GH_ParamAccess.list);
+            pManager.AddNumberParameter("MaximumDisplacementX", "Xmax", "The maximum displacement in the x direction [mm]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("MaximumDisplacementY", "Ymax", "The maximum displacement in the y direction [mm]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("MaximumDisplacementZ", "Zmax", "The maximum displacement in the z direction [mm]", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -51,18 +54,49 @@ namespace K2Structural
 
             //Calculate displacements
             List<Vector3d> displSum = new List<Vector3d>();
+            List<double> displX = new List<double>();
+            List<double> displY = new List<double>();
+            List<double> displZ = new List<double>();
 
             for (int i = 0; i < initialPositions.Count; i++)
             {
                 Vector3d displ = finalPositions[i] - initialPositions[i];
                 displ *= 1000;
+
                 displSum.Add(displ);
+                displX.Add(displ.X);
+                displY.Add(displ.Y);
+                displZ.Add(displ.Z);
             }
 
+            //Maximum values
+            double xMax = calcMaximumAbsVal(displX);
+            double yMax = calcMaximumAbsVal(displY);
+            double zMax = calcMaximumAbsVal(displZ);
 
             //Output
             DA.SetDataList(0, displSum);
+            DA.SetData(1, xMax);
+            DA.SetData(2, yMax);
+            DA.SetData(3, zMax);
         }
+
+        //Method
+        //Calculate the maximum absolute value from a list
+        double calcMaximumAbsVal(List<double> values)
+        {
+            double max = values.Max();
+            double min = values.Min();
+
+            double maxAbsVal = max;
+            if(Math.Abs(min) > max)
+            {
+                maxAbsVal = min;
+            }
+
+            return maxAbsVal;
+        }
+        
 
         /// <summary>
         /// Provides an Icon for the component.

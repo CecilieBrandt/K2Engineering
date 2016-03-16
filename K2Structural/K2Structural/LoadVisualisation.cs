@@ -30,7 +30,7 @@ namespace K2Structural
             pManager.AddPointParameter("Position", "pos", "The position of the load", GH_ParamAccess.list);
             pManager.AddVectorParameter("Load", "load", "The nodal load", GH_ParamAccess.list);
             pManager.AddColourParameter("Colour", "c", "The colour of the load", GH_ParamAccess.item, Color.DarkCyan);
-            pManager.AddNumberParameter("Scale", "sc", "Scale factor", GH_ParamAccess.item, 1000.0);
+            pManager.AddNumberParameter("Scale", "sc", "Scale factor", GH_ParamAccess.item, 1.0);
         }
 
         /// <summary>
