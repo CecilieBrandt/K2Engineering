@@ -66,7 +66,7 @@ namespace K2Structural
                 load = force;
 
                 PPos = new Point3d[1] {pt};
-                Move = new Vector3d[1];
+                Move = new Vector3d[1] {load};
                 Weighting = new double[1] {1.0};
             }
 
