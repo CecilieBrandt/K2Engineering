@@ -95,7 +95,6 @@
     <Compile Include="Rod.cs" />
     <Compile Include="Shear.cs" />
     <Compile Include="ShearVisualisation.cs" />
-    <Compile Include="SoapFilm.cs" />
     <Compile Include="StressSum.cs" />
     <Compile Include="Support.cs" />
   </ItemGroup>
