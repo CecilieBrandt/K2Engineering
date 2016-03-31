@@ -93,6 +93,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Rod.cs" />
+    <Compile Include="Shear.cs" />
+    <Compile Include="ShearVisualisation.cs" />
     <Compile Include="SoapFilm.cs" />
     <Compile Include="StressSum.cs" />
     <Compile Include="Support.cs" />
@@ -153,6 +155,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Wind.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Shear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ShearDisplay.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
