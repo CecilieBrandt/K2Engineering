@@ -2,7 +2,7 @@
 using System.Drawing;
 using Grasshopper.Kernel;
 
-namespace K2Structural
+namespace K2Engineering
 {
     public class K2StructuralInfo : GH_AssemblyInfo
     {

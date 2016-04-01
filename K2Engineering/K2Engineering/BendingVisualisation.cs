@@ -5,22 +5,21 @@ using Grasshopper.Kernel;
 using Rhino.Geometry;
 using System.Linq;
 
-namespace K2Structural
+namespace K2Engineering
 {
-    public class ShearVisualisation : GH_Component
+    public class BendingVisualisation : GH_Component
     {
-
         //Class properties
         List<Color> colours;
-        List<Polyline> polylines;
+        List<Line> lines;
 
 
         /// <summary>
-        /// Initializes a new instance of the ShearVisualisation class.
+        /// Initializes a new instance of the BendingVisualisation class.
         /// </summary>
-        public ShearVisualisation()
-          : base("ShearVisualisation", "ShearDisplay",
-              "Visualise the shear forces with colour (blue=low, green=medium, red=high)",
+        public BendingVisualisation()
+          : base("BendingVisualisation", "BendingDisplay",
+              "Visualise the bending stress with colour (blue=low, green=medium, red=high)",
               "K2Eng", "4 Display")
         {
         }
@@ -30,9 +29,9 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "ln", "Line segments", GH_ParamAccess.list);
-            pManager.AddVectorParameter("ShearVectors", "V", "Shear vector for each line segment", GH_ParamAccess.list);
-            pManager.AddNumberParameter("ScaleFactor", "sc", "A scale factor", GH_ParamAccess.item, 0.5);
+            pManager.AddPlaneParameter("Bending planes", "pl", "The bending planes", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Bending stresses", "stressB", "The bending stresses", GH_ParamAccess.list);
+            pManager.AddNumberParameter("ScaleFactor", "sc", "The scale factor of the lines", GH_ParamAccess.item, 0.5);
         }
 
         /// <summary>
@@ -49,59 +48,51 @@ namespace K2Structural
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            List<Line> lines = new List<Line>();
-            DA.GetDataList(0, lines);
+            List<Plane> planes = new List<Plane>();
+            DA.GetDataList(0, planes);
 
-            List<Vector3d> shearVectors = new List<Vector3d>();
-            DA.GetDataList(1, shearVectors);
+            List<double> stresses = new List<double>();
+            DA.GetDataList(1, stresses);
 
-            double scale = 0.5;
+            double scale = 1.0;
             DA.GetData(2, ref scale);
 
 
-            //Calculate
-
-            List<double> shearValues = new List<double>();
-            foreach(Vector3d s in shearVectors)
-            {
-                shearValues.Add(s.Length);
-            }
-
-            //Remap shear values to colours and polylines
+            //Remap stress values to colours and lines
             colours = new List<Color>();
-            polylines = new List<Polyline>();
+            lines = new List<Line>();
 
             double colourMax = 4 * 255.0;
             double colourMin = 0.0;
             double lengthMax = 1.0 * scale;
             double lengthMin = 0.1 * scale;
 
-            double minShear = shearValues.Min();
-            double maxShear = shearValues.Max();
-            double shearRange = maxShear - minShear;
+            double minStress = stresses.Min();
+            double maxStress = stresses.Max();
+            double stressRange = maxStress - minStress;
 
-            //if the min shear value is zero then the smallest length is zero
-            if (Math.Round(minShear, 4) == 0.0)
+            //if the min stress is zero then the smallest length is zero
+            if (Math.Round(minStress, 1) == 0.0)
             {
                 lengthMin = 0.0;
             }
 
 
-            for (int i = 0; i < shearValues.Count; i++)
+            for (int i = 0; i < stresses.Count; i++)
             {
-                //in case of constant shear (not equal to zero)
+                //in case of constant stress (not equal to zero)
                 int tMapColour = Convert.ToInt32(colourMax / 2.0);
-                double tMapLength = lengthMax;
+                double tMapLength = lengthMax / 2.0;
 
-                //If both max and min shear equals zero then the length is constant zero
-                if (Math.Round(maxShear, 4) == 0.0 && Math.Round(minShear, 4) == 0.0)
+                //If both max and min stress equals zero then the length is constant zero
+                if (Math.Round(maxStress, 1) == 0.0 && Math.Round(minStress, 1) == 0.0)
                 {
                     tMapLength = 0.0;
                 }
 
-                else if (Math.Round(shearRange, 4) != 0.0)
+                else if (Math.Round(stressRange, 1) != 0.0)
                 {
-                    double t = (shearValues[i] - minShear) / shearRange;
+                    double t = (stresses[i] - minStress) / stressRange;
                     tMapColour = Convert.ToInt32(t * (colourMax - colourMin) + colourMin);
                     tMapLength = t * (lengthMax - lengthMin) + lengthMin;
                 }
@@ -124,23 +115,14 @@ namespace K2Structural
                     c = Color.FromArgb(255, 255 - (tMapColour - (3 * 255)), 0);
                 }
 
-                colours.Add(c);
-
-                //Create polylines from shear directions and mapped lengths
-                Vector3d dir = shearVectors[i];
+                Vector3d dir = new Vector3d(planes[i].YAxis);
                 dir.Unitize();
                 dir *= tMapLength;
+                Line l = new Line(planes[i].Origin, planes[i].Origin + dir);
 
-                List<Point3d> polylinePts = new List<Point3d>();
-                polylinePts.Add(lines[i].From);
-                polylinePts.Add(lines[i].From + dir);
-                polylinePts.Add(lines[i].To + dir);
-                polylinePts.Add(lines[i].To);
-
-                Polyline pl = new Polyline(polylinePts);
-                polylines.Add(pl);
+                colours.Add(c);
+                lines.Add(l);
             }
-
         }
 
 
@@ -151,14 +133,13 @@ namespace K2Structural
             if (Hidden) { return; }             //if the component is hidden
             if (Locked) { return; }              //if the component is locked
 
-            if (polylines.Count != 0)
+            if (lines.Count != 0)
             {
-                for (int i = 0; i < polylines.Count; i++)
+                for (int i = 0; i < lines.Count; i++)
                 {
-                    if (polylines[i] != null)
+                    if (lines[i] != null)
                     {
-                        //args.Display.DrawLine(lines[i], colours[i], 2);
-                        args.Display.DrawPolyline(polylines[i], colours[i], 2);
+                        args.Display.DrawLine(lines[i], colours[i], 2);
                     }
                 }
             }
@@ -176,7 +157,7 @@ namespace K2Structural
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.ShearDisplay;
+                return Properties.Resources.BendingDisplay;
             }
         }
 
@@ -185,7 +166,7 @@ namespace K2Structural
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("{d488d4b0-242c-4aeb-bace-6c65ab059d5a}"); }
+            get { return new Guid("{d9f0db2c-973c-4516-8fd4-34719d5a6b0e}"); }
         }
     }
 }

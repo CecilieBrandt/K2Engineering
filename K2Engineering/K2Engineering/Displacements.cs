@@ -4,7 +4,7 @@ using System.Linq;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace K2Structural
+namespace K2Engineering
 {
     public class Displacements : GH_Component
     {

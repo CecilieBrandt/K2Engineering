@@ -4,7 +4,7 @@ using Rhino;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace K2Structural
+namespace K2Engineering
 {
     public class BarSelfweight : GH_Component
     {

@@ -8,8 +8,8 @@
     <ProjectGuid>{5F5A01B2-EF1A-4E58-8E5F-6D05C1A52876}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>K2Structural</RootNamespace>
-    <AssemblyName>K2Structural</AssemblyName>
+    <RootNamespace>K2Engineering</RootNamespace>
+    <AssemblyName>K2Engineering</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -44,10 +44,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="KangarooSolver">
-      <HintPath>..\..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\KangarooSolver.dll</HintPath>
+      <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\KangarooSolver.dll</HintPath>
     </Reference>
     <Reference Include="Plankton">
-      <HintPath>..\..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Plankton.dll</HintPath>
+      <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Plankton.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

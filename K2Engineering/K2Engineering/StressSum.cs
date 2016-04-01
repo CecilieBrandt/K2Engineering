@@ -6,7 +6,7 @@ using Rhino.Geometry;
 using Grasshopper.Kernel.Data;
 using Grasshopper;
 
-namespace K2Structural
+namespace K2Engineering
 {
     public class StressSum : GH_Component
     {

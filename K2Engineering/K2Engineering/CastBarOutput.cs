@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace K2Structural
+namespace K2Engineering
 {
-    public class CastSupportOutput : GH_Component
+    public class CastBarOutput : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the CastSupportOutput class.
+        /// Initializes a new instance of the CastBarOutput class.
         /// </summary>
-        public CastSupportOutput()
-          : base("CastSupportOutput", "SupportOutput",
-              "Cast the output of the support goal",
+        public CastBarOutput()
+          : base("CastBarOutput", "BarOutput",
+              "Cast the output of the bar goal",
               "K2Eng", "5 Utility")
         {
         }
@@ -23,7 +23,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("SupportOutput", "O", "The output from the support goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("BarOutput", "O", "The output from the bar goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -31,8 +31,11 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddPointParameter("SupportPt", "pt", "The support point", GH_ParamAccess.item);
-            pManager.AddVectorParameter("ReactionForce", "RF", "The reaction force [kN]", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("PIndexStart", "PI0", "The start particle index of a bar element", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("PIndexEnd", "PI1", "The end particle index of a bar element", GH_ParamAccess.item);
+            pManager.AddLineParameter("Line", "ln", "The updated line geometry", GH_ParamAccess.item);
+            pManager.AddNumberParameter("AxialForce", "F", "The axial force [kN] in the bar (- is compression)", GH_ParamAccess.item);
+            pManager.AddNumberParameter("AxialStress", "stressA", "The axial stress [MPa] in the bar (- is compression)", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -42,16 +45,24 @@ namespace K2Structural
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            Object[] output = new Object[2];
+            Object[] output = new Object[4];
             DA.GetData(0, ref output);
 
             //Casting
-            Point3d pt = (Point3d)output[0];
-            Vector3d reactionForce = (Vector3d)output[1];
+            int pIndexStart = (int)output[0];
+            int pIndexEnd = (int)output[1];
+
+            Line ln = (Line)output[2];
+
+            double force = (double)output[3];
+            double stress = (double)output[4];
 
             //Output
-            DA.SetData(0, pt);
-            DA.SetData(1, reactionForce);
+            DA.SetData(0, pIndexStart);
+            DA.SetData(1, pIndexEnd);
+            DA.SetData(2, ln);
+            DA.SetData(3, Math.Round(force, 3));
+            DA.SetData(4, Math.Round(stress, 1));
         }
 
         /// <summary>
@@ -63,7 +74,7 @@ namespace K2Structural
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.SupportOutput;
+                return Properties.Resources.BarOutput;
             }
         }
 
@@ -72,7 +83,7 @@ namespace K2Structural
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("{ab0bb292-8e4a-46d3-8890-955f0c00bc9b}"); }
+            get { return new Guid("{95d2e6d6-399c-4ec4-843f-fc6335ced616}"); }
         }
     }
 }

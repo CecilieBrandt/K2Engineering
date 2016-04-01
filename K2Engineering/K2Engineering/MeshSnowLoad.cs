@@ -4,16 +4,16 @@ using Plankton;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace K2Structural
+namespace K2Engineering
 {
-    public class MeshSelfweight : GH_Component
+    public class MeshSnowLoad : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the MeshSelfweight class.
+        /// Initializes a new instance of the MeshSnowLoad class.
         /// </summary>
-        public MeshSelfweight()
-          : base("MeshSelfweight", "MSelfweight",
-              "Calculate the selfweight of a mesh",
+        public MeshSnowLoad()
+          : base("MeshSnowLoad", "MSnow",
+              "Calculate the snow load on a mesh",
               "K2Eng", "2 Load")
         {
         }
@@ -24,8 +24,7 @@ namespace K2Structural
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [m]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Thickness", "t", "The thickness in [m]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("MaterialDensity", "rho", "The material density in [kg/m3]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("SnowLoad", "Q", "The snow load in [kN/m2]", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -34,7 +33,7 @@ namespace K2Structural
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddPointParameter("Points", "pts", "A list of points which the forces act on", GH_ParamAccess.list);
-            pManager.AddVectorParameter("NodalSelfweight", "Fweight", "The nodal selfweight in [N]", GH_ParamAccess.list);
+            pManager.AddVectorParameter("NodalSnowLoad", "Fsnow", "The nodal snow loads in [N]", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -47,17 +46,14 @@ namespace K2Structural
             PlanktonMesh pMesh = new PlanktonMesh();
             DA.GetData(0, ref pMesh);
 
-            double thickness = 0.0;
-            DA.GetData(1, ref thickness);
-
-            double rho = 0.0;
-            DA.GetData(2, ref rho);
+            double snowload = 0.0;
+            DA.GetData(1, ref snowload);
 
 
             //Calculate
             List<Point3d> verticesXYZ = extractVerticesXYZ(pMesh);
-            List<Vector3d> nodalLoads = calcNodalSelfweight(pMesh, thickness, rho);
-
+            PlanktonMesh pMeshXY = projectPMeshXY(pMesh);
+            List<Vector3d> nodalLoads = calcNodalSnowLoads(pMeshXY, snowload);
 
             //Output
             DA.SetDataList(0, verticesXYZ);
@@ -67,9 +63,9 @@ namespace K2Structural
 
         //Methods
 
-        //--------------------------------------------------------------------SELFWEIGHT---------------------------------------------------------//
-        //Calculate selfweight
-        List<Vector3d> calcNodalSelfweight(PlanktonMesh pMesh, double thickness, double rho)
+        //--------------------------------------------------------------------SNOW LOAD---------------------------------------------------------//
+        //Calculate nodal snow loads
+        List<Vector3d> calcNodalSnowLoads(PlanktonMesh pMesh, double snowload)
         {
             List<Vector3d> nodalLoads = new List<Vector3d>();
 
@@ -77,14 +73,34 @@ namespace K2Structural
             {
                 Vector3d dir = new Vector3d(0, 0, -1.0);
 
-                //Selfweight
+                //Snow load
                 double vertexArea = calcVertexVoronoiArea(pMesh, i);
-                Vector3d qs = dir * vertexArea * thickness * rho * 9.82;               //Units: [N]
+
+                Vector3d qs = new Vector3d(0, 0, 0);
+                if (!double.IsNaN(vertexArea))
+                {
+                    qs = dir * vertexArea * snowload * 1e3;               //Units: [N]
+                }
+
 
                 nodalLoads.Add(qs);
             }
 
             return nodalLoads;
+        }
+
+
+        //--------------------------------------------------------------------PROJECT MESH XY-PLANE---------------------------------------------------------//
+        PlanktonMesh projectPMeshXY(PlanktonMesh pMesh)
+        {
+            PlanktonMesh pMeshXY = new PlanktonMesh(pMesh);
+
+            for (int i = 0; i < pMeshXY.Vertices.Count; i++)
+            {
+                pMeshXY.Vertices[i].Z = (float)0.0;
+            }
+
+            return pMeshXY;
         }
 
 
@@ -241,7 +257,6 @@ namespace K2Structural
 
 
 
-
         /// <summary>
         /// Provides an Icon for the component.
         /// </summary>
@@ -251,7 +266,7 @@ namespace K2Structural
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Gravity;
+                return Properties.Resources.Snow;
             }
         }
 
@@ -260,7 +275,7 @@ namespace K2Structural
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("{6ff077ba-068b-438f-a751-aa26da15d95b}"); }
+            get { return new Guid("{a8003bae-380e-4ddd-aefe-85384e84d79c}"); }
         }
     }
 }

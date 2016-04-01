@@ -4,7 +4,7 @@ using KangarooSolver;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace K2Structural
+namespace K2Engineering
 {
     public class Rod : GH_Component
     {

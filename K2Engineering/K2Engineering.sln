@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K2Structural", "K2Structural\K2Structural.csproj", "{5F5A01B2-EF1A-4E58-8E5F-6D05C1A52876}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K2Engineering", "K2Engineering\K2Engineering.csproj", "{5F5A01B2-EF1A-4E58-8E5F-6D05C1A52876}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

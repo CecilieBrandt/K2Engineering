@@ -4,16 +4,16 @@ using Plankton;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace K2Structural
+namespace K2Engineering
 {
-    public class MeshWindLoad : GH_Component
+    public class MeshSelfweight : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the MeshWindLoad class.
+        /// Initializes a new instance of the MeshSelfweight class.
         /// </summary>
-        public MeshWindLoad()
-          : base("MeshWindLoad", "MWind",
-              "Calculate a simplified wind-load on a mesh",
+        public MeshSelfweight()
+          : base("MeshSelfweight", "MSelfweight",
+              "Calculate the selfweight of a mesh",
               "K2Eng", "2 Load")
         {
         }
@@ -24,8 +24,8 @@ namespace K2Structural
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A plankton mesh in [m]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("WindLoad", "Q", "The wind load in [kN/m2]", GH_ParamAccess.item, 1.0);
-            pManager.AddVectorParameter("WindDirection", "dir", "The wind-direction", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Thickness", "t", "The thickness in [m]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("MaterialDensity", "rho", "The material density in [kg/m3]", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace K2Structural
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddPointParameter("Points", "pts", "A list of points which the forces act on", GH_ParamAccess.list);
-            pManager.AddVectorParameter("NodalWindLoad", "Fwind", "The nodal wind loads in [N]", GH_ParamAccess.list);
+            pManager.AddVectorParameter("NodalSelfweight", "Fweight", "The nodal selfweight in [N]", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -47,17 +47,17 @@ namespace K2Structural
             PlanktonMesh pMesh = new PlanktonMesh();
             DA.GetData(0, ref pMesh);
 
-            double windload = 0.0;
-            DA.GetData(1, ref windload);
+            double thickness = 0.0;
+            DA.GetData(1, ref thickness);
 
-            Vector3d dir = new Vector3d();
-            DA.GetData(2, ref dir);
-            dir.Unitize();
+            double rho = 0.0;
+            DA.GetData(2, ref rho);
 
 
             //Calculate
             List<Point3d> verticesXYZ = extractVerticesXYZ(pMesh);
-            List<Vector3d> nodalLoads = calcNodalWindLoads(pMesh, windload, dir);
+            List<Vector3d> nodalLoads = calcNodalSelfweight(pMesh, thickness, rho);
+
 
             //Output
             DA.SetDataList(0, verticesXYZ);
@@ -67,65 +67,24 @@ namespace K2Structural
 
         //Methods
 
-        //--------------------------------------------------------------------WIND LOAD---------------------------------------------------------//
-        //Calculate nodal wind loads
-        List<Vector3d> calcNodalWindLoads(PlanktonMesh pMesh, double windload, Vector3d dir)
+        //--------------------------------------------------------------------SELFWEIGHT---------------------------------------------------------//
+        //Calculate selfweight
+        List<Vector3d> calcNodalSelfweight(PlanktonMesh pMesh, double thickness, double rho)
         {
             List<Vector3d> nodalLoads = new List<Vector3d>();
 
             for (int i = 0; i < pMesh.Vertices.Count; i++)
             {
-                Vector3d normal = calcVertexNormal(pMesh, i);
+                Vector3d dir = new Vector3d(0, 0, -1.0);
 
-                //Calculate projection onto wind direction
-                double proj = Vector3d.Multiply(normal, dir);
-                normal *= proj;
-
-                //Wind load
+                //Selfweight
                 double vertexArea = calcVertexVoronoiArea(pMesh, i);
-                Vector3d qw = normal * vertexArea * windload * 1e3;               //Units: [N]
+                Vector3d qs = dir * vertexArea * thickness * rho * 9.82;               //Units: [N]
 
-                nodalLoads.Add(qw);
+                nodalLoads.Add(qs);
             }
 
             return nodalLoads;
-        }
-
-        //--------------------------------------------------------------------VERTEX NORMALS---------------------------------------------------------//
-
-        // Calculate the face normal (not normalised)
-        Vector3d calcFaceNormal(PlanktonMesh pMesh, int f)
-        {
-            int[] faceVertices = pMesh.Faces.GetFaceVertices(f);
-            List<Point3d> faceVerticesXYZ = new List<Point3d>();
-            for (int i = 0; i < faceVertices.Length; i++)
-            {
-                faceVerticesXYZ.Add(new Point3d(pMesh.Vertices[faceVertices[i]].X, pMesh.Vertices[faceVertices[i]].Y, pMesh.Vertices[faceVertices[i]].Z));
-            }
-
-            Vector3d edge0 = new Vector3d(faceVerticesXYZ[1] - faceVerticesXYZ[0]);
-            Vector3d edge1 = new Vector3d(faceVerticesXYZ[2] - faceVerticesXYZ[1]);
-
-            Vector3d areaNormal = 0.5 * Vector3d.CrossProduct(edge0, edge1);
-
-            return areaNormal;
-        }
-
-
-        // Calculate the vertex normals as weighted average of the adjacent face normals
-        Vector3d calcVertexNormal(PlanktonMesh pMesh, int v)
-        {
-            int[] adjFaces = pMesh.Vertices.GetVertexFaces(v);
-            Vector3d vNormal = new Vector3d(0, 0, 0);
-            foreach (int face in adjFaces)
-            {
-                if (face != -1)
-                {
-                    vNormal += calcFaceNormal(pMesh, face);
-                }
-            }
-            vNormal.Unitize();
-            return vNormal;
         }
 
 
@@ -292,7 +251,7 @@ namespace K2Structural
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Wind;
+                return Properties.Resources.Gravity;
             }
         }
 
@@ -301,7 +260,7 @@ namespace K2Structural
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("{4f5d8b78-cd64-42e5-9e42-9bdb884ccd3e}"); }
+            get { return new Guid("{6ff077ba-068b-438f-a751-aa26da15d95b}"); }
         }
     }
 }

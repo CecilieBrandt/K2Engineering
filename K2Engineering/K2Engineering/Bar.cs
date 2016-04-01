@@ -4,16 +4,16 @@ using KangarooSolver;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 
-namespace K2Structural
+namespace K2Engineering
 {
-    public class Cable : GH_Component
+    public class Bar : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the Cable class.
+        /// Initializes a new instance of the Bar class.
         /// </summary>
-        public Cable()
-          : base("Cable", "Cable",
-              "A K2 cable element with pre-stress option",
+        public Bar()
+          : base("Bar", "Bar",
+              "A goal that represents a bar element with axial stiffness only. It outputs the extended/shortened line geometry, the axial force and stress value (- compression, + tension)",
               "K2Eng", "0 Elements")
         {
         }
@@ -23,11 +23,9 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "Ln", "Line representing the cable element [m]", GH_ParamAccess.item);
+            pManager.AddLineParameter("Line", "Ln", "Line representing the bar element [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("E-Modulus", "E", "E-Modulus of the material [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Area", "A", "Cross-section area [mm2]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("PreTension", "P", "Optional pre-tension [kN]", GH_ParamAccess.item);
-            pManager[3].Optional = true;
         }
 
         /// <summary>
@@ -35,7 +33,7 @@ namespace K2Structural
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Cable", "Cable", "Cable element with force and stress output", GH_ParamAccess.item);
+            pManager.AddGenericParameter("B", "Bar", "Bar element with force and stress output", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -54,38 +52,31 @@ namespace K2Structural
             double area = 0.0;
             DA.GetData(2, ref area);
 
-            double preStress = 0.0;
-            if (this.Params.Input[3].SourceCount != 0)
-            {
-                DA.GetData(3, ref preStress);
-            }
-
 
             //Create instance of bar
-            GoalObject cableElement = new CableGoal(line, eModulus, area, preStress);
+            GoalObject barElement = new BarGoal(line, eModulus, area);
 
 
             //Output
-            DA.SetData(0, cableElement);
+            DA.SetData(0, barElement);
         }
 
 
-        public class CableGoal : GoalObject
+        public class BarGoal : GoalObject
         {
             double restLenght;
+            bool isCompressionMember;
             double area;
 
-            public CableGoal(Line L, double E, double A, double F)
+            public BarGoal(Line L, double E, double A)
             {
                 restLenght = L.From.DistanceTo(L.To);
+                isCompressionMember = true;
                 area = A;
 
                 PPos = new Point3d[2] { L.From, L.To };
                 Move = new Vector3d[2];
-                Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght };           //Units: [N/m]
-
-                //Adjust restlenght if prestressed bar
-                restLenght -= (F * 1000 * restLenght) / (E * A);            //Units: [m]
+                Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght };           // Units: [N/m]
             }
 
             public override void Calculate(List<KangarooSolver.Particle> p)
@@ -101,34 +92,37 @@ namespace K2Structural
                 //Calculate extension
                 double extension = currentLength - restLenght;
 
-                //Test if cable is in tension, otherwise not active (zero force)
-                Vector3d forceStart = new Vector3d(0, 0, 0);
-                Vector3d forceEnd = new Vector3d(0, 0, 0);
                 if (extension > 0.0)
                 {
-                    forceStart = forceDir * (extension / 2);                //has to point to exact point according to Hooke's Law. Divide by 2 as the bar is extended in both directions with the same amount
-                    forceEnd = -forceDir * (extension / 2);
+                    isCompressionMember = false;
+                }
+                else if (extension < 0.0)
+                {
+                    isCompressionMember = true;
                 }
 
-                //Set move vectors
-                Move[0] = forceStart;
-                Move[1] = forceEnd;
+                //Set vector direction and magnitude
+                Move[0] = forceDir * (extension / 2);                 //has to point to exact point according to Hooke's Law. Divide by 2 as the bar is extended in both directions with the same amount
+                Move[1] = -forceDir * (extension / 2);
             }
 
             //Stress in bar (ONE VALUE PER LINE ELEMENT)
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                double force = Weighting[0] * Move[0].Length;
+                double factor = 1.0;
+                if (isCompressionMember)
+                {
+                    factor = -1.0;
+                }
 
-                //output the start and end particle index, the extended line, the force in [kN] and the stress in [MPa]
+                double force = factor * Weighting[0] * Move[0].Length;          //Units: [N]
+
+                //output the start and end particle index, the extended/shortened line, the force in [kN] and the stress in [MPa]
                 var Data = new object[5] { PIndex[0], PIndex[1], new Line(p[PIndex[0]].Position, p[PIndex[1]].Position), force / 1000.0, force / area };
                 return Data;
             }
 
         }
-
-
-
 
         /// <summary>
         /// Provides an Icon for the component.
@@ -139,7 +133,7 @@ namespace K2Structural
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.Cable;
+                return Properties.Resources.Bar;
             }
         }
 
@@ -148,7 +142,7 @@ namespace K2Structural
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("{efc6c913-9056-4825-b417-01083d2316bc}"); }
+            get { return new Guid("{ccf6dc32-7c3c-4836-94c2-e43e1e3c4f0d}"); }
         }
     }
 }
