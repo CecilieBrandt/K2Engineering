@@ -10,7 +10,7 @@ namespace K2Structural
         {
             get
             {
-                return "K2Structural";
+                return "K2Engineering";
             }
         }
         public override Bitmap Icon

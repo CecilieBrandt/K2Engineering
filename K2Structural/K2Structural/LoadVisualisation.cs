@@ -18,7 +18,7 @@ namespace K2Structural
         public LoadVisualisation()
           : base("LoadVisualisation", "LoadDisplay",
               "Visualise the load on the deformed structure",
-              "K2Structural", "4 Display")
+              "K2Eng", "4 Display")
         {
         }
 

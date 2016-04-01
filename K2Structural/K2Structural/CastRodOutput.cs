@@ -14,7 +14,7 @@ namespace K2Structural
         public CastRodOutput()
           : base("CastRodOutput", "RodOutput",
               "Cast the output of the rod goal",
-              "K2Structural", "5 Utility")
+              "K2Eng", "5 Utility")
         {
         }
 

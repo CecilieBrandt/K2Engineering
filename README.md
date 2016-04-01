@@ -1,4 +1,4 @@
-K2 Structural
+K2Engineering
 =============
 
 This repository contains a set of customised Kangaroo2 grasshopper components with the scope of calibrating the goals with regard to structural properties.

@@ -14,7 +14,7 @@ namespace K2Structural
         public BarSelfweight()
           : base("BarSelfweight", "BSelfweight",
               "Calculate the selfweight of bar elements",
-              "K2Structural", "2 Load")
+              "K2Eng", "2 Load")
         {
         }
 

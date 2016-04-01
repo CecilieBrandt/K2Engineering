@@ -14,7 +14,7 @@ namespace K2Structural
         public MeshWindLoad()
           : base("MeshWindLoad", "MWind",
               "Calculate a simplified wind-load on a mesh",
-              "K2Structural", "2 Load")
+              "K2Eng", "2 Load")
         {
         }
 

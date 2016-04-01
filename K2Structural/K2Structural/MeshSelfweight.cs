@@ -14,7 +14,7 @@ namespace K2Structural
         public MeshSelfweight()
           : base("MeshSelfweight", "MSelfweight",
               "Calculate the selfweight of a mesh",
-              "K2Structural", "2 Load")
+              "K2Eng", "2 Load")
         {
         }
 

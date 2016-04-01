@@ -14,7 +14,7 @@ namespace K2Structural
         public CastBarOutput()
           : base("CastBarOutput", "BarOutput",
               "Cast the output of the bar goal",
-              "K2Structural", "5 Utility")
+              "K2Eng", "5 Utility")
         {
         }
 

@@ -14,7 +14,7 @@ namespace K2Structural
         public Cable()
           : base("Cable", "Cable",
               "A K2 cable element with pre-stress option",
-              "K2Structural", "0 Elements")
+              "K2Eng", "0 Elements")
         {
         }
 
