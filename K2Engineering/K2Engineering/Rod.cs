@@ -95,11 +95,6 @@ namespace K2Engineering
             {
                 //K2 requirements
                 PPos = new Point3d[4] { LA.From, LA.To, LB.From, LB.To };
-                if (LA.To.CompareTo(LB.From) != 0)
-                {
-                    PPos[2] = LB.To;
-                    PPos[3] = LB.From;
-                }
                 Move = new Vector3d[4];
                 Weighting = new double[4] {E*I*1e-6, E*I*1e-6, E*I*1e-6, E*I*1e-6 };           //Units: [N*m2]
 
