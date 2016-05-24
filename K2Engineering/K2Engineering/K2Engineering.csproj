@@ -93,6 +93,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RectangularCS.cs" />
     <Compile Include="Rod.cs" />
     <Compile Include="Shear.cs" />
     <Compile Include="ShearVisualisation.cs" />
