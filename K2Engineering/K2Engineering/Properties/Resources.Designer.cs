@@ -113,6 +113,16 @@ namespace K2Engineering.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Circular {
+            get {
+                object obj = ResourceManager.GetObject("Circular", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Displacement {
             get {
                 object obj = ResourceManager.GetObject("Displacement", resourceCulture);
@@ -156,6 +166,16 @@ namespace K2Engineering.Properties {
         internal static System.Drawing.Bitmap LoadOutput {
             get {
                 object obj = ResourceManager.GetObject("LoadOutput", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Rectangular {
+            get {
+                object obj = ResourceManager.GetObject("Rectangular", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

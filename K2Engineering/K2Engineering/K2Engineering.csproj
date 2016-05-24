@@ -79,6 +79,7 @@
     <Compile Include="CastLoadOutput.cs" />
     <Compile Include="CastRodOutput.cs" />
     <Compile Include="CastSupportOutput.cs" />
+    <Compile Include="CircularCS.cs" />
     <Compile Include="Displacements.cs" />
     <Compile Include="K2StructuralInfo.cs" />
     <Compile Include="Load.cs" />
@@ -160,6 +161,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ShearDisplay.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Circular.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Rectangular.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
