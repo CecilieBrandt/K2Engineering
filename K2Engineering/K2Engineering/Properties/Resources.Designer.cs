@@ -103,6 +103,16 @@ namespace K2Engineering.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Buckling {
+            get {
+                object obj = ResourceManager.GetObject("Buckling", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Cable {
             get {
                 object obj = ResourceManager.GetObject("Cable", resourceCulture);
