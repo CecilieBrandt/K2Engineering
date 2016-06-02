@@ -14,7 +14,7 @@ namespace K2Engineering
         public CircularCS()
           : base("CircularCS", "Circle",
               "Calculate the cross section properties of a circular shape",
-              "K2Eng", "5 Utility")
+              "K2Eng", "6 Utility")
         {
         }
 

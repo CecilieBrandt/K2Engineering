@@ -14,7 +14,7 @@ namespace K2Engineering
         public RectangularCS()
           : base("RectangularCS", "Rectangle",
               "Calculate the cross section properties of a rectangular shape",
-              "K2Eng", "5 Utility")
+              "K2Eng", "6 Utility")
         {
         }
 

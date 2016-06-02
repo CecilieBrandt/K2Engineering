@@ -19,7 +19,7 @@ namespace K2Engineering
         public AxialVisualisation()
           : base("AxialVisualisation", "AxialDisplay",
               "Visualise the axial forces with colour and line weight (blue=tension, green=neutral, red=compression)",
-              "K2Eng", "4 Display")
+              "K2Eng", "5 Display")
         {
         }
 

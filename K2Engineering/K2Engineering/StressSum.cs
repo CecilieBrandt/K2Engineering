@@ -16,7 +16,7 @@ namespace K2Engineering
         public StressSum()
           : base("StressSum", "StressSum",
               "Summation of axial and bending stresses for each line segment",
-              "K2Eng", "3 Results")
+              "K2Eng", "4 Results")
         {
         }
 

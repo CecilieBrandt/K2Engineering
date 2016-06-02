@@ -20,7 +20,7 @@ namespace K2Engineering
         public BendingVisualisation()
           : base("BendingVisualisation", "BendingDisplay",
               "Visualise the bending stress with colour (blue=low, green=medium, red=high)",
-              "K2Eng", "4 Display")
+              "K2Eng", "5 Display")
         {
         }
 

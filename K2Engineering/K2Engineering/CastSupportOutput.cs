@@ -14,7 +14,7 @@ namespace K2Engineering
         public CastSupportOutput()
           : base("CastSupportOutput", "SupportOutput",
               "Cast the output of the support goal",
-              "K2Eng", "5 Utility")
+              "K2Eng", "6 Utility")
         {
         }
 

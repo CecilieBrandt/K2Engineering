@@ -14,7 +14,7 @@ namespace K2Engineering
         public Shear()
           : base("Shear", "Shear",
               "Calculate the shear values per line segment as the difference in moments at the endpoints [kN]",
-              "K2Eng", "3 Results")
+              "K2Eng", "4 Results")
         {
         }
 
