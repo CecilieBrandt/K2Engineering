@@ -54,19 +54,32 @@ namespace K2Engineering
 
 
             //Calculate
+            List<Vector3d> shearVectors = calcShearVectors(lines, moments, planes);
+
+
+            //Output
+            DA.SetDataList(0, shearVectors);
+        }
+
+
+        //Methods
+
+        //Calculate shear vectors
+        public static List<Vector3d> calcShearVectors(List<Line> lines, List<double> moments, List<Plane> planes)
+        {
             List<Point3d> planeOrigins = extractPlaneOrigins(planes);
 
-            List <Vector3d> shearVectors = new List<Vector3d>();
-            for(int i=0; i<lines.Count; i++)
+            List<Vector3d> shearVectors = new List<Vector3d>();
+            for (int i = 0; i < lines.Count; i++)
             {
                 int[] indexes = findEndIndexes(lines[i], planeOrigins);
 
                 Vector3d shear = new Vector3d();
-                if(indexes[0] != -1 && indexes[1] != -1)
+                if (indexes[0] != -1 && indexes[1] != -1)
                 {
                     shear = calcShearVector(planes[indexes[0]], moments[indexes[0]], planes[indexes[1]], moments[indexes[1]], lines[i]);
                 }
-                else if(indexes[0] != -1)
+                else if (indexes[0] != -1)
                 {
                     shear = calcShearVector(planes[indexes[0]], moments[indexes[0]], Plane.WorldXY, 0.0, lines[i]);     //Arbitrary other plane because it is multiplied by 0.0 kNm anyway
                 }
@@ -78,17 +91,12 @@ namespace K2Engineering
                 shearVectors.Add(shear);
             }
 
-
-            //Output
-            DA.SetDataList(0, shearVectors);
-
+            return shearVectors;
         }
 
 
-        //Methods
-
         //Extract origin of planes
-        List<Point3d> extractPlaneOrigins(List<Plane> planes)
+        public static List<Point3d> extractPlaneOrigins(List<Plane> planes)
         {
             List<Point3d> origins = new List<Point3d>();
 
@@ -103,7 +111,7 @@ namespace K2Engineering
 
 
         //Find the index of the endpoints of a line in the list of bending planes
-        int[] findEndIndexes(Line ln, List<Point3d> planeOrigins)
+        public static int[] findEndIndexes(Line ln, List<Point3d> planeOrigins)
         {
             Point3d lnStart = new Point3d(Math.Round(ln.FromX, 3), Math.Round(ln.FromY, 3), Math.Round(ln.FromZ, 3));
             Point3d lnEnd = new Point3d(Math.Round(ln.ToX, 3), Math.Round(ln.ToY, 3), Math.Round(ln.ToZ, 3));
@@ -130,7 +138,7 @@ namespace K2Engineering
 
             if(indexStart == -1 && indexEnd == -1)
             {
-                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Not able to find both start and end index for one or more lines");
+                throw new System.InvalidOperationException("Not able to find both start and end index for one or more lines");
             }
 
             return indexes;
@@ -138,7 +146,7 @@ namespace K2Engineering
 
 
         //Calculate the shear vector from the difference in moments at the start and end of line segment
-        Vector3d calcShearVector(Plane plStart, double momentStart, Plane plEnd, double momentEnd, Line ln)
+        public static Vector3d calcShearVector(Plane plStart, double momentStart, Plane plEnd, double momentEnd, Line ln)
         {
             //find the direction of the shear force
             Vector3d mdirStart = plStart.YAxis * momentStart;
