@@ -83,6 +83,7 @@ namespace K2Engineering
                 PPos = new Point3d[2] { L.From, L.To };
                 Move = new Vector3d[2];
                 Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght };           //Units: [N/m]
+                Name = "K2E_Cable";
 
                 //Adjust restlenght if prestressed bar
                 restLenght -= (F * 1000 * restLenght) / (E * A);            //Units: [m]
