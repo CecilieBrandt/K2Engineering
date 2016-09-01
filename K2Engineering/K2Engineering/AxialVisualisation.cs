@@ -47,7 +47,9 @@ namespace K2Engineering
         {
             //Input
             lines = new List<Line>();
-            DA.GetDataList(0, lines);
+            if (!DA.GetDataList(0, lines)) { return; }
+            if(lines == null || lines.Count == 0) { return; }
+            //DA.GetDataList(0, lines);
 
             List<double> stresses = new List<double>();
             DA.GetDataList(1, stresses);
