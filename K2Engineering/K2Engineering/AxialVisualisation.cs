@@ -49,10 +49,10 @@ namespace K2Engineering
             lines = new List<Line>();
             if (!DA.GetDataList(0, lines)) { return; }
             if(lines == null || lines.Count == 0) { return; }
-            //DA.GetDataList(0, lines);
+            
 
             List<double> stresses = new List<double>();
-            DA.GetDataList(1, stresses);
+            if (!DA.GetDataList(1, stresses)) { return; }
 
 
 
@@ -130,11 +130,11 @@ namespace K2Engineering
             if (Hidden) { return; }             //if the component is hidden
             if (Locked) { return; }              //if the component is locked
 
-            if (lines.Count != 0)
+            if (lines != null)
             {
                 for (int i = 0; i < lines.Count; i++)
                 {
-                    if (lines[i] != null)
+                    if (lines[i] != null && lines[i].IsValid)
                     {
                         args.Display.DrawLine(lines[i], colours[i], thickness[i]);
                     }

@@ -49,10 +49,10 @@ namespace K2Engineering
         {
             //Input
             List<Plane> planes = new List<Plane>();
-            DA.GetDataList(0, planes);
+            if (!DA.GetDataList(0, planes)) { return; }
 
             List<double> stresses = new List<double>();
-            DA.GetDataList(1, stresses);
+            if (!DA.GetDataList(1, stresses)) { return; }
 
             double scale = 1.0;
             DA.GetData(2, ref scale);
@@ -133,11 +133,11 @@ namespace K2Engineering
             if (Hidden) { return; }             //if the component is hidden
             if (Locked) { return; }              //if the component is locked
 
-            if (lines.Count != 0)
+            if (lines != null)
             {
                 for (int i = 0; i < lines.Count; i++)
                 {
-                    if (lines[i] != null)
+                    if (lines[i] != null && lines[i].IsValid)
                     {
                         args.Display.DrawLine(lines[i], colours[i], 2);
                     }

@@ -48,10 +48,10 @@ namespace K2Engineering
         {
             //Input
             List<Point3d> pts = new List<Point3d>();
-            DA.GetDataList(0, pts);
+            if (!DA.GetDataList(0, pts)) { return; }
 
             List<Vector3d> loads = new List<Vector3d>();
-            DA.GetDataList(1, loads);
+            if (!DA.GetDataList(1, loads)) { return; }
 
             c = Color.DarkCyan;
             DA.GetData(2, ref c);
@@ -89,11 +89,11 @@ namespace K2Engineering
             if (Hidden) { return; }             //if the component is hidden
             if (Locked) { return; }              //if the component is locked
 
-            if (lines.Count != 0)
+            if (lines != null)
             {
                 for (int i = 0; i < lines.Count; i++)
                 {
-                    if (lines[i] != null)
+                    if (lines[i] != null && lines[i].IsValid)
                     {
                         args.Display.DrawLine(lines[i], c, 2);
                     }

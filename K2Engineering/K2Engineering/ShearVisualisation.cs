@@ -50,10 +50,10 @@ namespace K2Engineering
         {
             //Input
             List<Line> lines = new List<Line>();
-            DA.GetDataList(0, lines);
+            if (!DA.GetDataList(0, lines)) { return; }
 
             List<Vector3d> shearVectors = new List<Vector3d>();
-            DA.GetDataList(1, shearVectors);
+            if (!DA.GetDataList(1, shearVectors)) { return; }
 
             double scale = 0.5;
             DA.GetData(2, ref scale);
@@ -151,13 +151,12 @@ namespace K2Engineering
             if (Hidden) { return; }             //if the component is hidden
             if (Locked) { return; }              //if the component is locked
 
-            if (polylines.Count != 0)
+            if (polylines != null)
             {
                 for (int i = 0; i < polylines.Count; i++)
                 {
-                    if (polylines[i] != null)
+                    if (polylines[i] != null && polylines[i].IsValid)
                     {
-                        //args.Display.DrawLine(lines[i], colours[i], 2);
                         args.Display.DrawPolyline(polylines[i], colours[i], 2);
                     }
                 }
