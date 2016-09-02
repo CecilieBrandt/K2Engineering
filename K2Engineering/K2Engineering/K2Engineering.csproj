@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="AxialVisualisation.cs" />
     <Compile Include="Bar.cs" />
+    <Compile Include="BarLength.cs" />
     <Compile Include="BarSelfweight.cs" />
     <Compile Include="BendingVisualisation.cs" />
     <Compile Include="BucklingAnalysis.cs" />
@@ -172,6 +173,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Buckling.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BarLength.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
