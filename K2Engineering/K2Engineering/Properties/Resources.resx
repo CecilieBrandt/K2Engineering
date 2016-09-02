@@ -145,6 +145,9 @@
   <data name="Displacement" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Displacement.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="DisplVisualisation" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DisplVisualisation.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Gravity" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Gravity.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

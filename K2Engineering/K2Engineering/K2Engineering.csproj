@@ -83,6 +83,7 @@
     <Compile Include="CastSupportOutput.cs" />
     <Compile Include="CircularCS.cs" />
     <Compile Include="Displacements.cs" />
+    <Compile Include="DisplacementVisualisation.cs" />
     <Compile Include="K2StructuralInfo.cs" />
     <Compile Include="Load.cs" />
     <Compile Include="LoadVisualisation.cs" />
@@ -176,6 +177,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\BarLength.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisplVisualisation.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

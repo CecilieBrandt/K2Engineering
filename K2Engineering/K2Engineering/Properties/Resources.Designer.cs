@@ -153,6 +153,16 @@ namespace K2Engineering.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DisplVisualisation {
+            get {
+                object obj = ResourceManager.GetObject("DisplVisualisation", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Gravity {
             get {
                 object obj = ResourceManager.GetObject("Gravity", resourceCulture);
