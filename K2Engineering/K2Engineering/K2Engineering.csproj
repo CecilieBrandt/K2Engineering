@@ -91,6 +91,7 @@
     <Compile Include="MeshSnowLoad.cs" />
     <Compile Include="MeshVertexArea.cs" />
     <Compile Include="MeshWindLoad.cs" />
+    <Compile Include="PMeshExt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
