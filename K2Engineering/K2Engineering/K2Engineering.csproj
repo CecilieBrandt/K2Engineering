@@ -89,6 +89,7 @@
     <Compile Include="LoadVisualisation.cs" />
     <Compile Include="MeshSelfweight.cs" />
     <Compile Include="MeshSnowLoad.cs" />
+    <Compile Include="MeshVertexArea.cs" />
     <Compile Include="MeshWindLoad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
