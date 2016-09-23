@@ -32,7 +32,7 @@ namespace K2Engineering
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddPointParameter("Points", "pts", "A list of points for which the bar lengths are calculated", GH_ParamAccess.list);
-            pManager.AddNumberParameter("NodeLengths", "L", "The nodal lengths", GH_ParamAccess.list);
+            pManager.AddNumberParameter("NodalLengths", "L", "The nodal lengths", GH_ParamAccess.list);
         }
 
         /// <summary>

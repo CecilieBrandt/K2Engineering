@@ -24,7 +24,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "PlanktonMesh in [m]", GH_ParamAccess.item);
+            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A PlanktonMesh", GH_ParamAccess.item);
             pManager.AddBooleanParameter("ProjectToXY", "proj", "Project the mesh faces to the XY plane (useful for e.g. snow load calculation)", GH_ParamAccess.item, false);
         }
 
@@ -34,7 +34,7 @@ namespace K2Engineering
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
             pManager.AddPointParameter("Vertices", "v", "The mesh vertices", GH_ParamAccess.list);
-            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area [m2]", GH_ParamAccess.list);
+            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area", GH_ParamAccess.list);
         }
 
         /// <summary>
