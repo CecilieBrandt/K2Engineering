@@ -33,7 +33,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddVectorParameter("NodalSelfweight", "S", "The nodal selfweight in [N]", GH_ParamAccess.list);
+            pManager.AddVectorParameter("NodalSelfweight", "FS", "The nodal selfweight in [N]", GH_ParamAccess.list);
         }
 
         /// <summary>
