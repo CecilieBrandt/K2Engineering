@@ -33,9 +33,8 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddGenericParameter("Vertices", "V", "The mesh vertices", GH_ParamAccess.list);
-            pManager.AddVectorParameter("VertexNormals", "n", "The vertex normals scaled according to the associated voronoi area [m2]", GH_ParamAccess.list);
-            pManager.AddVectorParameter("area", "a", "Areas", GH_ParamAccess.list);
+            pManager.AddPointParameter("Vertices", "v", "The mesh vertices", GH_ParamAccess.list);
+            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area [m2]", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -44,7 +43,7 @@ namespace K2Engineering
         /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            //Input
+            //------------------INPUT--------------------//
             PlanktonMesh pMesh = new PlanktonMesh();
             DA.GetData(0, ref pMesh);
 
@@ -52,39 +51,32 @@ namespace K2Engineering
             DA.GetData(1, ref projXY);
 
 
-            //Calculate
-            PMeshExt pMeshE = new PMeshExt(pMesh);
-            Point3d[] verticesXYZ = pMeshE.convertVerticesToXYZ();
-            Vector3d[] vertexNormals = pMeshE.calcVertexNormals();
 
-            Vector3d[] faceNormals = new Vector3d[pMeshE.Faces.Count];
-            for(int i=0; i<pMeshE.Faces.Count; i++)
+            //------------------CALCULATE--------------------//
+            PMeshExt pMeshE = new PMeshExt(pMesh);
+
+            if (!pMeshE.isMeshTriangulated())
             {
-                faceNormals[i] = pMeshE.calcFaceNormal(i);
+                this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The mesh has to be triangulated");
             }
 
+            //Extract vertices from initial 3d pMesh
+            Point3d[] verticesXYZ = pMeshE.convertVerticesToXYZ();
+
+            //If projected then create new pMesh
+            if (projXY)
+            {
+                pMeshE = pMeshE.projectMeshToXY();
+            }
+
+            Vector3d[] vertexAreas = pMeshE.calcVertexVoronoiAreas(projXY);
 
 
-            //Output
+
+            //------------------OUTPUT--------------------//
             DA.SetDataList(0, verticesXYZ);
-            DA.SetDataList(1, vertexNormals);
-            DA.SetDataList(2, faceNormals);
-
+            DA.SetDataList(1, vertexAreas);
         }
-
-        //Methods
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
