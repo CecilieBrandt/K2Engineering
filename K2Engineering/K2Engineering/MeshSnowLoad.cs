@@ -23,8 +23,8 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area (projected) [m2]", GH_ParamAccess.list);
             pManager.AddVectorParameter("Snow", "S", "The snow load as a vector indicating direction and magnitude [kN/m2]", GH_ParamAccess.item);
+            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area (projected) [m2]", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -42,11 +42,11 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            List<Vector3d> vertexNormals = new List<Vector3d>();
-            DA.GetDataList(0, vertexNormals);
-
             Vector3d snow = new Vector3d();
-            DA.GetData(1, ref snow);
+            DA.GetData(0, ref snow);
+
+            List<Vector3d> vertexNormals = new List<Vector3d>();
+            DA.GetDataList(1, vertexNormals);
 
 
             //Calculate

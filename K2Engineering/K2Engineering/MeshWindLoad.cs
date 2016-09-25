@@ -23,8 +23,8 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area [m2]", GH_ParamAccess.list);
             pManager.AddVectorParameter("Wind", "W", "The wind load as a vector indicating direction and magnitude [kN/m2]", GH_ParamAccess.item);
+            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area [m2]", GH_ParamAccess.list);
             pManager.AddBooleanParameter("ScaleOption", "opt", "If true, the force in each vertex is scaled according to its projection onto the wind direction. If false, only the sign is used to determine pressure/suction", GH_ParamAccess.item, true);
         }
 
@@ -43,11 +43,11 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            List<Vector3d> vertexNormals = new List<Vector3d>();
-            DA.GetDataList(0, vertexNormals);
-
             Vector3d wind = new Vector3d();
-            DA.GetData(1, ref wind);
+            DA.GetData(0, ref wind);
+
+            List<Vector3d> vertexNormals = new List<Vector3d>();
+            DA.GetDataList(1, vertexNormals);
 
             bool scale = true;
             DA.GetData(2, ref scale);
