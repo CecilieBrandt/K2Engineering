@@ -203,6 +203,16 @@ namespace K2Engineering.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MeshVertexArea {
+            get {
+                object obj = ResourceManager.GetObject("MeshVertexArea", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Rectangular {
             get {
                 object obj = ResourceManager.GetObject("Rectangular", resourceCulture);
