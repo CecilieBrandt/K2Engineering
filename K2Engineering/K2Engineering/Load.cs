@@ -68,7 +68,6 @@ namespace K2Engineering
                 PPos = new Point3d[1] {pt};
                 Move = new Vector3d[1] {load};
                 Weighting = new double[1] {1.0};
-                Name = "K2E_Load";
             }
 
             

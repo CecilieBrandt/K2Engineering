@@ -97,7 +97,6 @@ namespace K2Engineering
                 PPos = new Point3d[4] { LA.From, LA.To, LB.From, LB.To };
                 Move = new Vector3d[4];
                 Weighting = new double[4] {E*I*1e-6, E*I*1e-6, E*I*1e-6, E*I*1e-6 };           //Units: [N*m2]
-                Name = "K2E_Rod";
 
                 //Other
                 lineA = LA;

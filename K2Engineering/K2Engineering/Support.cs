@@ -89,7 +89,6 @@ namespace K2Engineering
                 PPos = new Point3d[1] { Pt };     // PPos must contain an array of the points this goal acts on
                 Move = new Vector3d[1];       // Move is an array of vectors, one for each PPos
                 Weighting = new double[1] { k }; // Weighting is an array of doubles for how strongly the goal affects each point
-                Name = "K2E_Support";
 
                 Target = Pt;
                 xFixed = x;
