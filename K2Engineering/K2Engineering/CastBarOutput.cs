@@ -61,8 +61,8 @@ namespace K2Engineering
             DA.SetData(0, pIndexStart);
             DA.SetData(1, pIndexEnd);
             DA.SetData(2, ln);
-            DA.SetData(3, force);
-            DA.SetData(4, stress);
+            DA.SetData(3, Math.Round(force,6));
+            DA.SetData(4, Math.Round(stress,3));
         }
 
         /// <summary>

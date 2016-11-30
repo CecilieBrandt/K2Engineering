@@ -56,8 +56,8 @@ namespace K2Engineering
             //Output
             DA.SetData(0, PIndex);
             DA.SetData(1, pl);
-            DA.SetData(2, moment);
-            DA.SetData(3, stress);
+            DA.SetData(2, Math.Round(moment,9));
+            DA.SetData(3, Math.Round(stress,3));
         }
 
         /// <summary>
