@@ -13,7 +13,7 @@ namespace K2Engineering
         /// </summary>
         public Cable()
           : base("Cable", "Cable",
-              "A K2 cable element with pre-stress option",
+              "A K2 cable element with pre-tension option",
               "K2Eng", "0 Elements")
         {
         }
@@ -26,7 +26,7 @@ namespace K2Engineering
             pManager.AddLineParameter("Line", "Ln", "Line representing the cable element [m]", GH_ParamAccess.item);
             pManager.AddNumberParameter("E-Modulus", "E", "E-Modulus of the material [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Area", "A", "Cross-section area [mm2]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("PreTension", "P", "Optional pre-tension [kN]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("PreTension", "P", "Optional pre-tension [N]", GH_ParamAccess.item);
             pManager[3].Optional = true;
         }
 
@@ -72,20 +72,19 @@ namespace K2Engineering
 
         public class CableGoal : GoalObject
         {
-            double restLenght;
+            double startLength;
+            double restLength;
             double area;
 
             public CableGoal(Line L, double E, double A, double F)
             {
-                restLenght = L.From.DistanceTo(L.To);
+                startLength = L.From.DistanceTo(L.To);
+                restLength = (startLength * E * A) / (F + (E * A));                                         //Units: [m]
                 area = A;
 
                 PPos = new Point3d[2] { L.From, L.To };
                 Move = new Vector3d[2];
-                Weighting = new double[2] { (2 * E * A) / restLenght, (2 * E * A) / restLenght };           //Units: [N/m]
-
-                //Adjust restlenght if prestressed bar
-                restLenght -= (F * 1000 * restLenght) / (E * A);            //Units: [m]
+                Weighting = new double[2] { (2 * E * A) / restLength, (2 * E * A) / restLength };           //Units: [N/m]
             }
 
             public override void Calculate(List<KangarooSolver.Particle> p)
@@ -99,7 +98,7 @@ namespace K2Engineering
                 forceDir.Unitize();
 
                 //Calculate extension
-                double extension = currentLength - restLenght;
+                double extension = currentLength - restLength;
 
                 //Test if cable is in tension, otherwise not active (zero force)
                 Vector3d forceStart = new Vector3d(0, 0, 0);
