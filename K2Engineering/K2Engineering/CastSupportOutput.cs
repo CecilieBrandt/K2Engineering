@@ -42,12 +42,13 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            Object[] output = new Object[2];
+            //Object[] output = new Object[2];
+            DataTypes.SupportData output = new DataTypes.SupportData();
             DA.GetData(0, ref output);
 
             //Casting
-            Point3d pt = (Point3d)output[0];
-            Vector3d reactionForce = (Vector3d)output[1];
+            Point3d pt = output.Location;
+            Vector3d reactionForce = output.Reaction;
 
             //Output
             DA.SetData(0, pt);

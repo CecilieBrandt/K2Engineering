@@ -43,11 +43,21 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GH_IO">
+      <HintPath>C:\Users\James Solly\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Grasshopper">
+      <HintPath>C:\Users\James Solly\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
+      <Private>True</Private>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="KangarooSolver">
-      <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\KangarooSolver.dll</HintPath>
+      <HintPath>C:\Users\James Solly\AppData\Roaming\Grasshopper\Libraries\Kangaroo\KangarooSolver.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Plankton">
-      <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Plankton.dll</HintPath>
+      <HintPath>C:\Users\James Solly\AppData\Roaming\Grasshopper\Libraries\Plankton.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -56,16 +66,6 @@
     <Reference Include="RhinoCommon">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Rhinoceros 5\System\rhinocommon.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Grasshopper">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GH_IO">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -82,6 +82,10 @@
     <Compile Include="CastRodOutput.cs" />
     <Compile Include="CastSupportOutput.cs" />
     <Compile Include="CircularCS.cs" />
+    <Compile Include="DataTypes\BarData.cs" />
+    <Compile Include="DataTypes\SupportData.cs" />
+    <Compile Include="DataTypes\RodData.cs" />
+    <Compile Include="DataTypes\PointLoadData.cs" />
     <Compile Include="Displacements.cs" />
     <Compile Include="DisplacementVisualisation.cs" />
     <Compile Include="K2StructuralInfo.cs" />

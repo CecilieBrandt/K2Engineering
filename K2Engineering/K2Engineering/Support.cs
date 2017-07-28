@@ -121,8 +121,8 @@ namespace K2Engineering
 
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                var Data = new object[2] { p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3 };                //output support point with reaction force in KN
-
+                //var Data = new object[2] { p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3 };                //output support point with reaction force in KN
+                DataTypes.SupportData Data = new DataTypes.SupportData(p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3);
                 return Data;
             }
 

@@ -45,17 +45,19 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            Object[] output = new Object[4];
+
+            //Object[] output = new Object[4];
+            DataTypes.BarData output = new DataTypes.BarData();
             DA.GetData(0, ref output);
 
             //Casting
-            int pIndexStart = (int)output[0];
-            int pIndexEnd = (int)output[1];
+            int pIndexStart = output.Index1;
+            int pIndexEnd = output.Index2;
 
-            Line ln = (Line)output[2];
+            Line ln = output.BarLine;
 
-            double force = (double)output[3];
-            double stress = (double)output[4];
+            double force = output.Force;
+            double stress = output.Stress;
 
             //Output
             DA.SetData(0, pIndexStart);
