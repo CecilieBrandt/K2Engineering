@@ -87,6 +87,7 @@
     <Compile Include="K2StructuralInfo.cs" />
     <Compile Include="Load.cs" />
     <Compile Include="LoadVisualisation.cs" />
+    <Compile Include="Materials.cs" />
     <Compile Include="MeshSelfweight.cs" />
     <Compile Include="MeshSnowLoad.cs" />
     <Compile Include="MeshVertexArea.cs" />
