@@ -10,7 +10,9 @@ This is particularly useful for the analysis of form-active structures (includin
 Dependencies
 ============
 Install the following plugins:
-[Kangaroo2](http://www.food4rhino.com/app/kangaroo-physics)  
+
+[Kangaroo2](http://www.food4rhino.com/app/kangaroo-physics) 
+
 [Plankton](https://github.com/meshmash/Plankton/releases)
 
 
@@ -32,7 +34,9 @@ This software is licensed under the Apache 2 license: http://www.apache.org/lice
 Acknowledgement
 ===============
 Thanks to Daniel Piker for the amazing Kangaroo2 plugin.
+
 Thanks to James Solly for continuous dialogue and help improving the plugin.
+
 Thanks to Format Engineers for a keen interest in applying the tool to relevant projects and thereby guiding the development.
 
 Also thanks to Anders Deleuran, Gregory Quinn, Harri Lewis and Will Pearson for valuable inspiration and discussions.
