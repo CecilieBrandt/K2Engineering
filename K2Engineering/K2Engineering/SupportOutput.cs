@@ -6,14 +6,14 @@ using Rhino.Geometry;
 
 namespace K2Engineering
 {
-    public class CastLoadOutput : GH_Component
+    public class SupportOutput : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the CastLoadOutput class.
+        /// Initializes a new instance of the CastSupportOutput class.
         /// </summary>
-        public CastLoadOutput()
-          : base("CastLoadOutput", "LoadOutput",
-              "Cast the output of the load goal",
+        public SupportOutput()
+          : base("SupportOutput", "SupportOutput",
+              "Extract the output of the Support goal",
               "K2Eng", "6 Utility")
         {
         }
@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("LoadData", "LD", "The LoadData from the output of the Load goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("SupportData", "SD", "The SupportData from the output of the Support goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddPointParameter("Position", "pos", "The position of the load", GH_ParamAccess.item);
-            pManager.AddVectorParameter("Load", "load", "The nodal load in [kN]", GH_ParamAccess.item);
+            pManager.AddPointParameter("SupportPt", "pt", "The support point", GH_ParamAccess.item);
+            pManager.AddVectorParameter("ReactionForce", "RF", "The reaction force [kN]", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -42,16 +42,16 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            DataTypes.PointLoadData loadData = new DataTypes.PointLoadData();
-            DA.GetData(0, ref loadData);
+            DataTypes.SupportData supportData = new DataTypes.SupportData();
+            DA.GetData(0, ref supportData);
 
             //Extract properties
-            Point3d pt = loadData.Location;
-            Vector3d force = loadData.Load;
+            Point3d pt = supportData.Location;
+            Vector3d reactionForce = supportData.Reaction;
 
             //Output
             DA.SetData(0, pt);
-            DA.SetData(1, force);
+            DA.SetData(1, reactionForce);
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace K2Engineering
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.LoadOutput;
+                return Properties.Resources.SupportOutput;
             }
         }
 
@@ -72,7 +72,7 @@ namespace K2Engineering
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("{fab9d682-f0bd-47fc-bbbe-4efd19cee19c}"); }
+            get { return new Guid("{ab0bb292-8e4a-46d3-8890-955f0c00bc9b}"); }
         }
     }
 }

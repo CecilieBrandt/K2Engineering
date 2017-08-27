@@ -6,14 +6,14 @@ using Rhino.Geometry;
 
 namespace K2Engineering
 {
-    public class CastSupportOutput : GH_Component
+    public class RodOutput : GH_Component
     {
         /// <summary>
-        /// Initializes a new instance of the CastSupportOutput class.
+        /// Initializes a new instance of the CastRodOutput class.
         /// </summary>
-        public CastSupportOutput()
-          : base("CastSupportOutput", "SupportOutput",
-              "Cast the output of the support goal",
+        public RodOutput()
+          : base("RodOutput", "RodOutput",
+              "Extract the output of the Rod goal",
               "K2Eng", "6 Utility")
         {
         }
@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("SupportData", "SD", "The SupportData from the output of the Support goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("RodData", "RD", "The RodData from the output of the Rod goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -31,8 +31,10 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddPointParameter("SupportPt", "pt", "The support point", GH_ParamAccess.item);
-            pManager.AddVectorParameter("ReactionForce", "RF", "The reaction force [kN]", GH_ParamAccess.item);
+            pManager.AddIntegerParameter("PIndexBending", "PI12", "The particle index associated with the calculated moment", GH_ParamAccess.item);
+            pManager.AddPlaneParameter("Plane", "pl", "The bending plane", GH_ParamAccess.item);
+            pManager.AddNumberParameter("BendingMoment", "M", "The bending moment [kNm]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("BendingStress", "stressB", "The bending stress [MPa]", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -42,16 +44,20 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            DataTypes.SupportData supportData = new DataTypes.SupportData();
-            DA.GetData(0, ref supportData);
+            DataTypes.RodData rodData = new DataTypes.RodData();
+            DA.GetData(0, ref rodData);
 
             //Extract properties
-            Point3d pt = supportData.Location;
-            Vector3d reactionForce = supportData.Reaction;
+            int PIndex = rodData.SharedPointIndex;
+            Plane pl = rodData.BendingPlane;
+            double moment = rodData.Moment;
+            double stress = rodData.BendingStress;
 
             //Output
-            DA.SetData(0, pt);
-            DA.SetData(1, reactionForce);
+            DA.SetData(0, PIndex);
+            DA.SetData(1, pl);
+            DA.SetData(2, Math.Round(moment,9));
+            DA.SetData(3, Math.Round(stress,3));
         }
 
         /// <summary>
@@ -63,7 +69,7 @@ namespace K2Engineering
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return Properties.Resources.SupportOutput;
+                return Properties.Resources.RodOutput;
             }
         }
 
@@ -72,7 +78,7 @@ namespace K2Engineering
         /// </summary>
         public override Guid ComponentGuid
         {
-            get { return new Guid("{ab0bb292-8e4a-46d3-8890-955f0c00bc9b}"); }
+            get { return new Guid("{280510b1-3f9e-42a0-a30d-2282ebae97b5}"); }
         }
     }
 }

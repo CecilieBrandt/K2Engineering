@@ -58,7 +58,7 @@
       <HintPath>C:\Program Files (x86)\Rhinoceros 5\System\rhinocommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
-	<Reference Include="Grasshopper">
+    <Reference Include="Grasshopper">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
       <Private>False</Private>
@@ -77,10 +77,10 @@
     <Compile Include="BendingVisualisation.cs" />
     <Compile Include="BucklingAnalysis.cs" />
     <Compile Include="Cable.cs" />
-    <Compile Include="CastBarOutput.cs" />
-    <Compile Include="CastLoadOutput.cs" />
-    <Compile Include="CastRodOutput.cs" />
-    <Compile Include="CastSupportOutput.cs" />
+    <Compile Include="BarOutput.cs" />
+    <Compile Include="LoadOutput.cs" />
+    <Compile Include="RodOutput.cs" />
+    <Compile Include="SupportOutput.cs" />
     <Compile Include="CircularCS.cs" />
     <Compile Include="DataTypes\BarData.cs" />
     <Compile Include="DataTypes\SupportData.cs" />

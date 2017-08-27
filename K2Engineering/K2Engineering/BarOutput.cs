@@ -6,14 +6,14 @@ using Rhino.Geometry;
 
 namespace K2Engineering
 {
-    public class CastBarOutput : GH_Component
+    public class BarOutput : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the CastBarOutput class.
         /// </summary>
-        public CastBarOutput()
-          : base("CastBarOutput", "BarOutput",
-              "Cast the output of the bar goal",
+        public BarOutput()
+          : base("BarOutput", "BarOutput",
+              "Extract the output of the Bar goal",
               "K2Eng", "6 Utility")
         {
         }
