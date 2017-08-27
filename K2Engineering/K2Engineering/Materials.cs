@@ -22,7 +22,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("MaterialIndex", "MatId", "0:Steel, 1:Aluminium, 2:Timber, 3:GFRP, 4:Carbon fiber, 5:ETFE, 6:Dyneema, 7:Kevlar", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("MaterialIndex", "MatId", "0:Steel, 1:Aluminium, 2:Timber, 3:ETFE, 4:GFRP, 5:Carbon fiber, 6:Kevlar, 7:Dyneema", GH_ParamAccess.item, 0);
         }
 
         /// <summary>
@@ -78,51 +78,63 @@ namespace K2Engineering
                 density = 680;
                 E = (12737 + 4763) / 2.0;
                 fy = (50.9 + 29) / 2.0;
+
+                //www.metsateollisuus.fi/uploads/2017/03/30041750/887.pdf
+            }
+
+            //ETFE
+            else if (index == 3)
+            {
+                name = "ETFE";
+                density = 1750;
+                E = 965;
+                fy = 48;
+
+                //www.pronatindustries.com/wp-content/uploads/2015/03/Norton-ETFE.pdf
             }
 
             //GFRP
-            else if (index == 3)
+            else if (index == 4)
             {
                 name = "GFRP";
                 density = 2100;
                 E = 40e3;
                 fy = 900;
+                
+                //www.fibrolux.com/main/knowledge/properties
             }
 
             //Carbon fiber
-            else if (index == 4)
-            {
-                name = "Carbon fiber";
-                density = 1600;
-                E = (125e3 + 181e3) / 2.0;
-                fy = 900;
-            }
-
-            //ETFE
             else if (index == 5)
             {
-                name = "ETFE";
-                density = 1700;
-                E = 960;
-                fy = 20;
-            }
+                name = "Carbon fiber";
+                density = 1760;
+                E = 230e3;
+                fy = 3500;
 
-            //Dyneema
-            else if (index == 6)
-            {
-                name = "Dyneema";
-                density = 990;
-                E = (55e3 + 172e3) / 2.0;
-                fy = 1400;
+                //www.siltex.eu/wp-content/uploads/2011/03/Carbon-Data-Sheet.pdf
             }
 
             //Kevlar
-            else
+            else if(index == 6)
             {
                 name = "Kevlar (49)";
                 density = 1440;
-                E = (70.5e3 + 112.4e3) / 2.0;
-                fy = 3000;
+                E = 112.4e3;
+                fy = 2800;
+
+                //www.dupont.com/content/dam/dupont/products-and-services/fabrics-fibers-and-nonwovens/fibers/documents/Kevlar_Technical_Guide.pdf
+            }
+
+            //Dyneema
+            else
+            {
+                name = "Dyneema";
+                density = 980;
+                E = 116e3;
+                fy = 3600;
+
+                //www.issuu.com/eurofibers/docs/name8f0d44
             }
 
 
