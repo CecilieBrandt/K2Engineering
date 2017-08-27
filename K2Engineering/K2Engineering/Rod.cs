@@ -117,7 +117,7 @@ namespace K2Engineering
 
             public override void Calculate(List<KangarooSolver.Particle> p)
             {
-                Point3d P0 = p[PIndex[0]].Position;             //get the current position of the particle at the start of the line
+                Point3d P0 = p[PIndex[0]].Position;
                 Point3d P1 = p[PIndex[1]].Position;
                 Point3d P2 = p[PIndex[2]].Position;
                 Point3d P3 = p[PIndex[3]].Position;

@@ -4,7 +4,7 @@ using Grasshopper.Kernel;
 
 namespace K2Engineering
 {
-    public class K2StructuralInfo : GH_AssemblyInfo
+    public class K2EngineeringInfo : GH_AssemblyInfo
     {
         public override string Name
         {
@@ -42,7 +42,7 @@ namespace K2Engineering
             get
             {
                 //Return a string identifying you or your company.
-                return "";
+                return "Cecilie Brandt-Olsen";
             }
         }
         public override string AuthorContact

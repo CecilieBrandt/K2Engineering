@@ -89,8 +89,8 @@ namespace K2Engineering
 
             public override void Calculate(List<KangarooSolver.Particle> p)
             {
-                Point3d ptStart = p[PIndex[0]].Position;             //get the current position of the particle at the start of the line
-                Point3d ptEnd = p[PIndex[1]].Position;             //get the current position of the particle at the end of the line
+                Point3d ptStart = p[PIndex[0]].Position;
+                Point3d ptEnd = p[PIndex[1]].Position;
 
                 //Calculate force direction
                 Vector3d forceDir = new Vector3d(ptEnd - ptStart);  //force direction pointing from start of line to end

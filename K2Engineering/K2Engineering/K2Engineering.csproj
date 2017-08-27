@@ -88,7 +88,7 @@
     <Compile Include="DataTypes\PointLoadData.cs" />
     <Compile Include="Displacements.cs" />
     <Compile Include="DisplacementVisualisation.cs" />
-    <Compile Include="K2StructuralInfo.cs" />
+    <Compile Include="K2EngineeringInfo.cs" />
     <Compile Include="Load.cs" />
     <Compile Include="LoadVisualisation.cs" />
     <Compile Include="Materials.cs" />

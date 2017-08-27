@@ -12,7 +12,7 @@ namespace K2Engineering
         /// </summary>
         public Materials()
           : base("Materials", "Mat",
-              "List of predefined material properties",
+              "List of predefined material properties (use as guidance only)",
               "K2Eng", "6 Utility")
         {
         }
