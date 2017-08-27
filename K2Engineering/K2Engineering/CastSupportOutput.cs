@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("SupportOutput", "O", "The output from the support goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("SupportData", "SD", "The SupportData from the output of the Support goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -42,13 +42,12 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            //Object[] output = new Object[2];
-            DataTypes.SupportData output = new DataTypes.SupportData();
-            DA.GetData(0, ref output);
+            DataTypes.SupportData supportData = new DataTypes.SupportData();
+            DA.GetData(0, ref supportData);
 
-            //Casting
-            Point3d pt = output.Location;
-            Vector3d reactionForce = output.Reaction;
+            //Extract properties
+            Point3d pt = supportData.Location;
+            Vector3d reactionForce = supportData.Reaction;
 
             //Output
             DA.SetData(0, pt);

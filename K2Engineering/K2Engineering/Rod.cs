@@ -93,7 +93,6 @@ namespace K2Engineering
 
             public RodGoal(Line LA, Line LB, double E, double I, double z, int opt)
             {
-                //K2 requirements
                 PPos = new Point3d[4] { LA.From, LA.To, LB.From, LB.To };
                 Move = new Vector3d[4];
                 Weighting = new double[4] {E*I*1e-6, E*I*1e-6, E*I*1e-6, E*I*1e-6 };           //Units: [N*m2]
@@ -148,10 +147,10 @@ namespace K2Engineering
             }
 
 
-            //Stress at the point between two line segments
+            //Output bending plane and moment between two consecutive line segments. Moment in [kNm] and stress in [MPa]
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                Point3d P0 = p[PIndex[0]].Position;             //get the current position of the particle at the start of the line
+                Point3d P0 = p[PIndex[0]].Position;
                 Point3d P1 = p[PIndex[1]].Position;
                 Point3d P2 = p[PIndex[2]].Position;
                 Point3d P3 = p[PIndex[3]].Position;
@@ -170,16 +169,9 @@ namespace K2Engineering
                 planeXAxis.Unitize();
                 Plane pl = new Plane(P1, planeXAxis, planeYAxis);
 
-                //Output the particle index of the shared point between the two consecutive line segments, the bending plane, the moment [kNm] and the stress [MPa]
-                //var Data = new Object[4];
-                //Data[0] = PIndex[1];
-                //Data[1] = pl;
-                //Data[2] = moment * 1e-6;
-                //Data[3] = bendingStress;
-
-                DataTypes.RodData Data = new DataTypes.RodData(PIndex[1], pl, moment * 1e-6, bendingStress);
-
-                return Data;
+                //Create rod data object to store output information
+                DataTypes.RodData rodData = new DataTypes.RodData(PIndex[1], pl, moment * 1e-6, bendingStress);
+                return rodData;
             }
 
         }

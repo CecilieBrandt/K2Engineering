@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("BarOutput", "O", "The output from the bar goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("BarData", "BD", "The BarData from the output of the Bar/Cable goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -45,19 +45,17 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
+            DataTypes.BarData barData = new DataTypes.BarData();
+            DA.GetData(0, ref barData);
 
-            //Object[] output = new Object[4];
-            DataTypes.BarData output = new DataTypes.BarData();
-            DA.GetData(0, ref output);
+            //Extract properties
+            int pIndexStart = barData.Index1;
+            int pIndexEnd = barData.Index2;
 
-            //Casting
-            int pIndexStart = output.Index1;
-            int pIndexEnd = output.Index2;
+            Line ln = barData.BarLine;
 
-            Line ln = output.BarLine;
-
-            double force = output.Force;
-            double stress = output.Stress;
+            double force = barData.Force;
+            double stress = barData.Stress;
 
             //Output
             DA.SetData(0, pIndexStart);

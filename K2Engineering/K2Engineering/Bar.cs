@@ -106,7 +106,7 @@ namespace K2Engineering
                 Move[1] = -forceDir * (extension / 2);
             }
 
-            //Stress in bar (ONE VALUE PER LINE ELEMENT)
+            //Output geometry and force in bar. Force in [kN] and stress in [MPa]
             public override object Output(List<KangarooSolver.Particle> p)
             {
                 double factor = 1.0;
@@ -117,10 +117,9 @@ namespace K2Engineering
 
                 double force = factor * Weighting[0] * Move[0].Length;          //Units: [N]
 
-                //output the start and end particle index, the extended/shortened line, the force in [kN] and the stress in [MPa]
-                //var Data = new object[5] { PIndex[0], PIndex[1], new Line(p[PIndex[0]].Position, p[PIndex[1]].Position), force / 1000.0, force / area };
-                DataTypes.BarData Data = new DataTypes.BarData(PIndex[0], PIndex[1], new Line(p[PIndex[0]].Position, p[PIndex[1]].Position), force / 1000.0, force / area);
-                return Data;
+                //Create bar data object to store output information
+                DataTypes.BarData barData = new DataTypes.BarData(PIndex[0], PIndex[1], new Line(p[PIndex[0]].Position, p[PIndex[1]].Position), force / 1000.0, force / area);
+                return barData;
             }
 
         }

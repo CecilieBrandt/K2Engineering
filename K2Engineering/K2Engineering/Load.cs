@@ -80,9 +80,9 @@ namespace K2Engineering
             //Output updated position of node where the load acts. Load in [kN]
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                //var Data = new object[2] {p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3};
-                DataTypes.PointLoadData Data = new DataTypes.PointLoadData(p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3);
-                return Data;
+                //Create load data object to store output information
+                DataTypes.PointLoadData loadData = new DataTypes.PointLoadData(p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3);
+                return loadData;
             }
 
         }

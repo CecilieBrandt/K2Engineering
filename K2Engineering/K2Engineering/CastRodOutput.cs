@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("RodOutput", "O", "The output from the rod goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("RodData", "RD", "The RodData from the output of the Rod goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -44,15 +44,14 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            //Object[] output = new Object[3];
-            DataTypes.RodData output = new DataTypes.RodData();
-            DA.GetData(0, ref output);
+            DataTypes.RodData rodData = new DataTypes.RodData();
+            DA.GetData(0, ref rodData);
 
-            //Casting
-            int PIndex = output.SharedPointIndex;
-            Plane pl = output.BendingPlane;
-            double moment = output.Moment;
-            double stress = output.BendingStress;
+            //Extract properties
+            int PIndex = rodData.SharedPointIndex;
+            Plane pl = rodData.BendingPlane;
+            double moment = rodData.Moment;
+            double stress = rodData.BendingStress;
 
             //Output
             DA.SetData(0, PIndex);
