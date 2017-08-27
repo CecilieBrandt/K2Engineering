@@ -44,14 +44,15 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            Object[] output = new Object[3];
+            //Object[] output = new Object[3];
+            DataTypes.RodData output = new DataTypes.RodData();
             DA.GetData(0, ref output);
 
             //Casting
-            int PIndex = (int)output[0];
-            Plane pl = (Plane)output[1];
-            double moment = (double)output[2];
-            double stress = (double)output[3];
+            int PIndex = output.SharedPointIndex;
+            Plane pl = output.BendingPlane;
+            double moment = output.Moment;
+            double stress = output.BendingStress;
 
             //Output
             DA.SetData(0, PIndex);

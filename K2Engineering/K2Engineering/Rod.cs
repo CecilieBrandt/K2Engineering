@@ -171,11 +171,13 @@ namespace K2Engineering
                 Plane pl = new Plane(P1, planeXAxis, planeYAxis);
 
                 //Output the particle index of the shared point between the two consecutive line segments, the bending plane, the moment [kNm] and the stress [MPa]
-                var Data = new Object[4];
-                Data[0] = PIndex[1];
-                Data[1] = pl;
-                Data[2] = moment * 1e-6;
-                Data[3] = bendingStress;
+                //var Data = new Object[4];
+                //Data[0] = PIndex[1];
+                //Data[1] = pl;
+                //Data[2] = moment * 1e-6;
+                //Data[3] = bendingStress;
+
+                DataTypes.RodData Data = new DataTypes.RodData(PIndex[1], pl, moment * 1e-6, bendingStress);
 
                 return Data;
             }
