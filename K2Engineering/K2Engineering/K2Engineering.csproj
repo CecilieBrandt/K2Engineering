@@ -74,6 +74,7 @@
     <Compile Include="Bar.cs" />
     <Compile Include="BarLength.cs" />
     <Compile Include="BarSelfweight.cs" />
+    <Compile Include="Beam.cs" />
     <Compile Include="BendingVisualisation.cs" />
     <Compile Include="BucklingAnalysis.cs" />
     <Compile Include="Cable.cs" />
