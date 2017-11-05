@@ -91,6 +91,10 @@ namespace K2Engineering
             Plane P1R;              //Updated end plane (local)
 
             double restLength;
+            double ext;     //check
+            double extSimple;       //check
+            Vector3d axialMove;     //check
+
             double E, G, A, Iy, Iz, It;
             double thetaY0, thetaZ0, thetaY1, thetaZ1, thetaX;
 
@@ -158,19 +162,22 @@ namespace K2Engineering
                 Vector3d Y1 = P1R.XAxis;
                 Vector3d Z1 = P1R.YAxis;
 
-                //Biaxial bending angle changes
+                //Bending angle changes around local axes
                 thetaY0 = Z0 * elementDir;
-                thetaZ0 = -Y0 * elementDir;
+                thetaZ0 = Y0 * elementDir;         //Should this be negative or is it accounted for in the following equations? Emil uses (-) whereas Olsson and Piker use (+)
                 thetaY1 = Z1 * elementDir;
-                thetaZ1 = -Y1 * elementDir;
+                thetaZ1 = Y1 * elementDir;         //Should this be negative?
 
-                //Twist angle change
+                //Twist angle change around element axis
                 thetaX = ((Y0 * Z1) - (Y1 * Z0)) / 2.0;
 
 
                 //Axial
-                //double extension = currentLength - restLength;
-                double extension = ((Math.Pow(elementVec.Length, 2) - Math.Pow(restLength, 2)) / (2.0 * restLength)) + ((restLength / 60.0) * (4.0 * (Math.Pow(thetaY0, 2) + Math.Pow(thetaZ0, 2)) - 2.0 * ((thetaY0 * thetaY1) - (thetaZ0 * thetaZ1)) + 4.0 * (Math.Pow(thetaY1, 2) + Math.Pow(thetaZ1, 2))));         //Unit: [m]
+                //double extension = ((Math.Pow(currentLength, 2) - Math.Pow(restLength, 2)) / (2.0 * restLength)) + ((restLength / 60.0) * (4.0 * (Math.Pow(thetaY0, 2) + Math.Pow(thetaZ0, 2)) - 2.0 * ((thetaY0 * thetaY1) - (thetaZ0 * thetaZ1)) + 4.0 * (Math.Pow(thetaY1, 2) + Math.Pow(thetaZ1, 2))));         //Unit: [m]
+                double extension = (Math.Pow(currentLength, 2) - Math.Pow(restLength, 2)) / (2.0 * restLength);     //Try simple axial without bowing to start with
+
+                ext = extension;    //check
+                extSimple = currentLength - restLength;     //check
 
 
                 //Element internal forces (referring to 2.1.11 to 2.1.16)
@@ -189,66 +196,79 @@ namespace K2Engineering
 
 
                 //Global forces (referring to 2.1.17 to 2.1.20)
+
                 //Force start
-                double F0X = (1.0 / restLength) * ((N * elementVec.X) + (MY0 * Z0.X) - (MZ0 * Y0.X) + (MY1 * Z1.X) + (MZ1 * Y1.X));
-                double F0Y = (1.0 / restLength) * ((N * elementVec.Y) + (MY0 * Z0.Y) - (MZ0 * Y0.Y) + (MY1 * Z1.Y) + (MZ1 * Y1.Y));
-                double F0Z = (1.0 / restLength) * ((N * elementVec.Z) + (MY0 * Z0.Z) - (MZ0 * Y0.Z) + (MY1 * Z1.Z) + (MZ1 * Y1.Z)); 
+                double F0X = (1.0 / restLength) * ((N * elementDir.X) + (MY0 * Z0.X) - (MZ0 * Y0.X) + (MY1 * Z1.X) - (MZ1 * Y1.X));     //Last term (-) according to Olsson
+                double F0Y = (1.0 / restLength) * ((N * elementDir.Y) + (MY0 * Z0.Y) - (MZ0 * Y0.Y) + (MY1 * Z1.Y) - (MZ1 * Y1.Y));
+                double F0Z = (1.0 / restLength) * ((N * elementDir.Z) + (MY0 * Z0.Z) - (MZ0 * Y0.Z) + (MY1 * Z1.Z) - (MZ1 * Y1.Z)); 
                 Vector3d F0 = new Vector3d(F0X, F0Y, F0Z);          //Unit: [N]
+
+                axialMove = new Vector3d(F0);       //check
 
                 //Force end
                 Vector3d F1 = -1 * F0;
+                //---------------------------------------------SOMETHING IS WRONG WITH AXIAL BEHAVIOUR (CHECK EXTENSION)-------------------------------------------//
 
+
+
+                //Permutation symbol: Includes 6 non-zero components. Is a triple product of unit vectors (elementDir,y,z) of an orthogonal frame in a right-handed coordinate system
                 //Moment start
                 //i=1, j=2, k=3
-                double M0X_pos = (-1.0) * (((MY0 * elementVec.Z * Z0.Y) / restLength) - ((MZ0 * elementVec.Z * Y0.Y) / restLength) + ((MX * ((Y0.Y * Z1.Z) - (Z0.Y * Y1.Z))) / 2.0));
+                double M0X_pos = (-1.0) * (((MY0 * elementDir.Z * Z0.Y) / restLength) - ((MZ0 * elementDir.Z * Y0.Y) / restLength) + ((MX * ((Y0.Y * Z1.Z) - (Z0.Y * Y1.Z))) / 2.0));
 
                 //i=2, j=3, k=1
-                double M0Y_pos = (-1.0) * (((MY0 * elementVec.X * Z0.Z) / restLength) - ((MZ0 * elementVec.X * Y0.Z) / restLength) + ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
+                double M0Y_pos = (-1.0) * (((MY0 * elementDir.X * Z0.Z) / restLength) - ((MZ0 * elementDir.X * Y0.Z) / restLength) + ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
 
                 //i=3, j=1, k=2
-                double M0Z_pos = (-1.0) * (((MY0 * elementVec.Y * Z0.X) / restLength) - ((MZ0 * elementVec.Y * Y0.X) / restLength) + ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
+                double M0Z_pos = (-1.0) * (((MY0 * elementDir.Y * Z0.X) / restLength) - ((MZ0 * elementDir.Y * Y0.X) / restLength) + ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
 
 
                 //i=1, j=3, k=2
-                double M0X_neg = (1.0) * (((MY0 * elementVec.Y * Z0.Z) / restLength) - ((MZ0 * elementVec.Y * Y0.Z) / restLength) + ((MX * ((Y0.Z * Z1.Y) - (Z0.Z * Y1.Y))) / 2.0));
+                double M0X_neg = (1.0) * (((MY0 * elementDir.Y * Z0.Z) / restLength) - ((MZ0 * elementDir.Y * Y0.Z) / restLength) + ((MX * ((Y0.Z * Z1.Y) - (Z0.Z * Y1.Y))) / 2.0));
 
                 //i=2, j=1, k=3
-                double M0Y_neg = (1.0) * (((MY0 * elementVec.Z * Z0.X) / restLength) - ((MZ0 * elementVec.Z * Y0.X) / restLength) + ((MX * ((Y0.X * Z1.Z) - (Z0.X * Y1.Z))) / 2.0));
+                double M0Y_neg = (1.0) * (((MY0 * elementDir.Z * Z0.X) / restLength) - ((MZ0 * elementDir.Z * Y0.X) / restLength) + ((MX * ((Y0.X * Z1.Z) - (Z0.X * Y1.Z))) / 2.0));
 
                 //i=3, j=2, k=1
-                double M0Z_neg = (1.0) * (((MY0 * elementVec.X * Z0.Y) / restLength) - ((MZ0 * elementVec.X * Y0.Y) / restLength) + ((MX * ((Y0.Y * Z1.X) - (Z0.Y * Y1.X))) / 2.0));
+                double M0Z_neg = (1.0) * (((MY0 * elementDir.X * Z0.Y) / restLength) - ((MZ0 * elementDir.X * Y0.Y) / restLength) + ((MX * ((Y0.Y * Z1.X) - (Z0.Y * Y1.X))) / 2.0));
 
+                //Sum of components
                 Vector3d M0 = new Vector3d(M0X_pos + M0X_neg, M0Y_pos + M0Y_neg, M0Z_pos + M0Z_neg);          //Unit: [Nm]
 
 
                 //Moment end
                 //i=1, j=2, k=3
-                double M1X_pos = (-1.0) * (((MY1 * elementVec.Z * Z1.Y) / restLength) - ((MZ1 * elementVec.Z * Y1.Y) / restLength) + ((MX * ((Y0.Y * Z1.Z) - (Z0.Y * Y1.Z))) / 2.0));
+                double M1X_pos = (-1.0) * (((MY1 * elementDir.Z * Z1.Y) / restLength) - ((MZ1 * elementDir.Z * Y1.Y) / restLength) - ((MX * ((Y0.Y * Z1.Z) - (Z0.Y * Y1.Z))) / 2.0));       // (-) torsion term according to Olsson
 
                 //i=2, j=3, k=1
-                double M1Y_pos = (-1.0) * (((MY1 * elementVec.X * Z1.Z) / restLength) - ((MZ1 * elementVec.X * Y1.Z) / restLength) + ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
+                double M1Y_pos = (-1.0) * (((MY1 * elementDir.X * Z1.Z) / restLength) - ((MZ1 * elementDir.X * Y1.Z) / restLength) - ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
 
                 //i=3, j=1, k=2
-                double M1Z_pos = (-1.0) * (((MY1 * elementVec.Y * Z1.X) / restLength) - ((MZ1 * elementVec.Y * Y1.X) / restLength) + ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
+                double M1Z_pos = (-1.0) * (((MY1 * elementDir.Y * Z1.X) / restLength) - ((MZ1 * elementDir.Y * Y1.X) / restLength) - ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
 
 
                 //i=1, j=3, k=2
-                double M1X_neg = (1.0) * (((MY1 * elementVec.Y * Z1.Z) / restLength) - ((MZ1 * elementVec.Y * Y1.Z) / restLength) + ((MX * ((Y0.Z * Z1.Y) - (Z0.Z * Y1.Y))) / 2.0));
+                double M1X_neg = (1.0) * (((MY1 * elementDir.Y * Z1.Z) / restLength) - ((MZ1 * elementDir.Y * Y1.Z) / restLength) - ((MX * ((Y0.Z * Z1.Y) - (Z0.Z * Y1.Y))) / 2.0));
 
                 //i=2, j=1, k=3
-                double M1Y_neg = (1.0) * (((MY1 * elementVec.Z * Z1.X) / restLength) - ((MZ1 * elementVec.Z * Y1.X) / restLength) + ((MX * ((Y0.X * Z1.Z) - (Z0.X * Y1.Z))) / 2.0));
+                double M1Y_neg = (1.0) * (((MY1 * elementDir.Z * Z1.X) / restLength) - ((MZ1 * elementDir.Z * Y1.X) / restLength) - ((MX * ((Y0.X * Z1.Z) - (Z0.X * Y1.Z))) / 2.0));
 
                 //i=3, j=2, k=1
-                double M1Z_neg = (1.0) * (((MY1 * elementVec.X * Z1.Y) / restLength) - ((MZ1 * elementVec.X * Y1.Y) / restLength) + ((MX * ((Y0.Y * Z1.X) - (Z0.Y * Y1.X))) / 2.0));           
+                double M1Z_neg = (1.0) * (((MY1 * elementDir.X * Z1.Y) / restLength) - ((MZ1 * elementDir.X * Y1.Y) / restLength) - ((MX * ((Y0.Y * Z1.X) - (Z0.Y * Y1.X))) / 2.0));
 
+                //Sum of components
                 Vector3d M1 = new Vector3d(M1X_pos + M1X_neg, M1Y_pos + M1Y_neg, M1Z_pos + M1Z_neg);            //Unit: [Nm]
 
+                
 
                 //Move and torque vectors
                 Move[0] = F0;
                 Move[1] = F1;
-                Torque[0] = M0;
-                Torque[1] = M1;
+
+                Torque[0] = new Vector3d(0, 0, 0);
+                Torque[1] = new Vector3d(0, 0, 0);
+                //Torque[0] = M0;
+                //Torque[1] = M1;
             }
 
 
@@ -261,25 +281,32 @@ namespace K2Engineering
                 DataOut.Add(P0R);
                 DataOut.Add(P1R);
 
-                //Element forces and moments
-                DataOut.Add(Math.Round(N * 1e-3, 3));           //Unit: [kN]
-                DataOut.Add(Math.Round(MY0 * 1e-3, 3));         //Unit: [kNm]
-                DataOut.Add(Math.Round(MZ0 * 1e-3, 3));         //Unit: [kNm]
-                DataOut.Add(Math.Round(MY1 * 1e-3, 3));         //Unit: [kNm]
-                DataOut.Add(Math.Round(MZ1 * 1e-3, 3));         //Unit: [kNm]
-                DataOut.Add(Math.Round(MX * 1e-3, 3));          //Unit: [kNm]
-
-
                 //Angles
-                /*
                 DataOut.Add(thetaX);
                 DataOut.Add(thetaY0);
                 DataOut.Add(thetaZ0);
                 DataOut.Add(thetaY1);
                 DataOut.Add(thetaZ1);
-                */
+
+                //Other
+                DataOut.Add(N);
+                DataOut.Add(ext);
+                DataOut.Add(extSimple);
+                DataOut.Add(axialMove);
+
+
+                //Element forces and moments
+                //DataOut.Add(Math.Round(N * 1e-3, 3));           //Unit: [kN]
+                //DataOut.Add(Math.Round(MY0 * 1e-3, 3));         //Unit: [kNm]
+                //DataOut.Add(Math.Round(MZ0 * 1e-3, 3));         //Unit: [kNm]
+                //DataOut.Add(Math.Round(MY1 * 1e-3, 3));         //Unit: [kNm]
+                //DataOut.Add(Math.Round(MZ1 * 1e-3, 3));         //Unit: [kNm]
+                //DataOut.Add(Math.Round(MX * 1e-3, 3));          //Unit: [kNm]
+
 
                 return DataOut;
+
+
 
                 //To do: create beam data object to store output information
                 //DataTypes.BeamData beamData = new DataTypes.BeamData();
