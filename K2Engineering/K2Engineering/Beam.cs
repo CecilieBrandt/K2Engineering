@@ -266,6 +266,7 @@ namespace K2Engineering
             //Output moment in [kNm] and normal force/shear in [kN]
             public override object Output(List<KangarooSolver.Particle> p)
             {
+                /*
                 List<object> DataOut = new List<object>();
 
                 //Updated local planes
@@ -281,12 +282,11 @@ namespace K2Engineering
                 DataOut.Add(Math.Round(MZ1 * 1e-3, 3));         //Unit: [kNm]
 
                 return DataOut;
+                */
 
-
-
-                //To do: create beam data object to store output information
-                //DataTypes.BeamData beamData = new DataTypes.BeamData();
-                //return beamData;
+                //Output data (Axial force in [kN] and moments in [kNm])
+                DataTypes.BeamData beamData = new DataTypes.BeamData(P0R, P1R, Math.Round(N * 1e-3, 3), Math.Round(MX * 1e-3, 3), Math.Round(MY0 * 1e-3, 3), Math.Round(MZ0 * 1e-3, 3), Math.Round(MY1 * 1e-3, 3), Math.Round(MZ1 * 1e-3, 3));
+                return beamData;
             }
 
         }

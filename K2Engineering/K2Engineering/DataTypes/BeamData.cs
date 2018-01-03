@@ -7,7 +7,7 @@ using Rhino.Geometry;
 
 namespace K2Engineering.DataTypes
 {
-    class BeamData
+    public class BeamData
     {
         public Plane P0;
         public Plane P1;
