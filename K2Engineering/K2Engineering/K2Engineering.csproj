@@ -79,6 +79,7 @@
     <Compile Include="BucklingAnalysis.cs" />
     <Compile Include="Cable.cs" />
     <Compile Include="BarOutput.cs" />
+    <Compile Include="DataTypes\BeamData.cs" />
     <Compile Include="LoadOutput.cs" />
     <Compile Include="RodOutput.cs" />
     <Compile Include="SupportOutput.cs" />
