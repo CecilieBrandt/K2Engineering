@@ -165,9 +165,9 @@ namespace K2Engineering
 
                 //Bending angle changes around local axes
                 thetaY0 = Z0 * elementDir;
-                thetaZ0 = Y0 * elementDir;         //Negative?
+                thetaZ0 = -Y0 * elementDir;
                 thetaY1 = Z1 * elementDir;
-                thetaZ1 = Y1 * elementDir;         //Negative?
+                thetaZ1 = -Y1 * elementDir;
 
                 //Twist angle change around element axis
                 thetaX = ((Y0 * Z1) - (Y1 * Z0)) / 2.0;
