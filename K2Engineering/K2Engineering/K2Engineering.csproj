@@ -84,6 +84,7 @@
     <Compile Include="DataTypes\BeamData.cs" />
     <Compile Include="LoadOutput.cs" />
     <Compile Include="RodOutput.cs" />
+    <Compile Include="Support6DOF.cs" />
     <Compile Include="SupportOutput.cs" />
     <Compile Include="CircularCS.cs" />
     <Compile Include="DataTypes\BarData.cs" />

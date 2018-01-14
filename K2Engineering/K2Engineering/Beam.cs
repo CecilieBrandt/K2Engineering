@@ -110,7 +110,8 @@ namespace K2Engineering
                 double axialStiffness = (E * A) / restLength;                   //Unit: N/m
                 int axialDigits = axialStiffness.ToString().Split('.')[0].Length;
 
-                double bendingStiffness = E * Math.Max(Iy, Iz);          //Unit: N*mm2  (multiply with 1e-6 to get N*m2)
+                double bendingStiffness = E * Math.Max(Iy, Iz);          
+                bendingStiffness *= 1.0;                            //Unit: N*mm2  (multiply with 1e-6 to get N*m2)
                 int bendingDigits = bendingStiffness.ToString().Split('.')[0].Length;
 
                 //K2 properties
@@ -165,9 +166,9 @@ namespace K2Engineering
 
                 //Bending angle changes around local axes
                 thetaY0 = Z0 * elementDir;
-                thetaZ0 = -Y0 * elementDir;
+                thetaZ0 = -Y0 * elementDir;     //Negative
                 thetaY1 = Z1 * elementDir;
-                thetaZ1 = -Y1 * elementDir;
+                thetaZ1 = -Y1 * elementDir;     //Negative
 
                 //Twist angle change around element axis
                 thetaX = ((Y0 * Z1) - (Y1 * Z0)) / 2.0;
@@ -180,9 +181,8 @@ namespace K2Engineering
 
                 //Element internal forces (referring to 2.1.11 to 2.1.16)
                 N = ((E * A) / restLength) * extension;      // Unit: [N]
-
                 
-                MY0 = (((N * restLength) / 30.0) * ((4.0 * thetaY0) - thetaY1)) + (((2.0 * E * Iy * 1e-6) / restLength) * ((2.0 * thetaY0) - thetaY1));          //Unit: [Nm]
+                MY0 = (((N * restLength) / 30.0) * ((4.0 * thetaY0) - thetaY1)) + (((2.0 * E * Iy * 1e-6) / restLength) * ((2.0 * thetaY0) - thetaY1));          //Unit: [Nm]           Check last minus sign; should be + according to Sigrids thesis
                 MY1 = (((N * restLength) / 30.0) * ((4.0 * thetaY1) - thetaY0)) + (((2.0 * E * Iy * 1e-6) / restLength) * ((2.0 * thetaY1) - thetaY0));          //Unit: [Nm]
 
                 MZ0 = (((N * restLength) / 30.0) * ((4.0 * thetaZ0) - thetaZ1)) + (((2.0 * E * Iz * 1e-6) / restLength) * ((2.0 * thetaZ0) - thetaZ1));          //Unit: [Nm]
@@ -201,7 +201,7 @@ namespace K2Engineering
                 Vector3d F0 = new Vector3d(F0X, F0Y, F0Z);          //Unit: [N]
 
                 //Force end
-                Vector3d F1 = -1 * F0;
+                Vector3d F1 = -1.0 * F0;
 
 
                 //Permutation symbol: Includes 6 non-zero components. Is a triple product of vectors (elementVec,y,z) of an orthogonal frame in a right-handed coordinate system
