@@ -83,14 +83,23 @@ namespace K2Engineering
             double temp;
 
             bool opt;
+            bool negativePres;
 
             public PressureGoal(PlanktonMesh mesh, double p, bool option)
             {
                 pMesh = (PlanktonMesh) mesh;
 
                 //Pressure
-                pres0 = p;      // Unit: [N/m2] / [Pa]
+                pres0 = Math.Abs(p);      // Unit: [N/m2] / [Pa]
                 pres1 = pres0;
+                if (p < 0.0)
+                {
+                    negativePres = true;
+                }
+                else
+                {
+                    negativePres = false;
+                }
 
                 //Calculate starting volume
                 vol0 = 0.0;         // Unit: [m3]
@@ -212,6 +221,10 @@ namespace K2Engineering
                 {
                     Vector3d n = new Vector3d(normals[k]);
                     n.Unitize();
+                    if (negativePres)
+                    {
+                        n.Reverse();
+                    }
                     Move[k] = pres1 * vertexAreas[k] * n;
                 }
 
@@ -230,7 +243,15 @@ namespace K2Engineering
                 }
 
                 //Create pressure data object to store output information
-                DataTypes.PressureData presData = new DataTypes.PressureData(vertices, pForces, Math.Round(pres0*1e-3,3), Math.Round(pres1*1e-3,3), Math.Round(vol0,3), Math.Round(vol1,3), Convert.ToInt32(mol0), Convert.ToInt32(mol1));
+                double p0 = pres0 * 1e-3;       //Unit: [kN/m2]
+                double p1 = pres1 * 1e-3;       //Unit: [kN/m2]
+                if (negativePres)
+                {
+                    p0 *= -1.0;
+                    p1 *= -1.0;
+                }
+
+                DataTypes.PressureData presData = new DataTypes.PressureData(vertices, pForces, Math.Round(p0,3), Math.Round(p1,3), Math.Round(vol0,3), Math.Round(vol1,3), Convert.ToInt32(mol0), Convert.ToInt32(mol1));
                 return presData;
             }
 
