@@ -106,13 +106,27 @@ namespace K2Engineering
                 Iz = inertiaZ;
                 It = inertiaT;
 
+
                 //stiffness properties used to set the weightings
-                double axialStiffness = (E * A) / restLength;                   //Unit: N/m
+                double axialStiffness = (E * A) / restLength;                               //Unit: N/m
                 int axialDigits = axialStiffness.ToString().Split('.')[0].Length;
 
-                double bendingStiffness = E * Math.Max(Iy, Iz);          
-                bendingStiffness *= 1.0;                            //Unit: N*mm2  (multiply with 1e-6 to get N*m2)
+                //max bending stiffness
+                /*
+                double bsY = (E * Iy * 1e-6) / restLength;                              //Unit: N*m
+                double bsZ = (E * Iz * 1e-6) / restLength;                              //Unit: N*m 
+
+                double bendingStiffness = bsY;
+                if(bsZ > bsY)
+                {
+                    bendingStiffness = bsZ;
+                }
+                */
+
+                double bendingStiffness = E * Math.Max(Iy, Iz);
+                bendingStiffness *= 0.01;                                                   //Still needs some adjustment to achieve acceptable convergence speed
                 int bendingDigits = bendingStiffness.ToString().Split('.')[0].Length;
+
 
                 //K2 properties
                 PPos = new Point3d[2] {startPlane.Origin, endPlane.Origin};
@@ -126,11 +140,13 @@ namespace K2Engineering
                 Plane endGlobal = new Plane(endPlane.Origin, Vector3d.XAxis, Vector3d.YAxis);
                 InitialOrientation = new Plane[2] { startGlobal, endGlobal };       //Needs to be global because the calculated forces and rotations in nodes are calculated globally
 
+
                 //Local end planes
                 P0 = startPlane;
                 P1 = endPlane;
                 P0R = P0;
                 P1R = P1;
+
 
                 //Translate initial local end planes to Origin
                 P0.Transform(Transform.ChangeBasis(Plane.WorldXY, startGlobal));
@@ -149,7 +165,7 @@ namespace K2Engineering
                 Vector3d elementDir = new Vector3d(elementVec);
                 elementDir.Unitize();
 
-                //Calculate angle changes (referring to Eq. 2.1.7 to 2.1.9)
+                //Calculate angle changes
                 //Get the initial orientations of the end planes (local orientation sitting in Origin)
                 P0R = P0;
                 P1R = P1;
@@ -165,35 +181,40 @@ namespace K2Engineering
                 Vector3d Z1 = P1R.YAxis;
 
                 //Bending angle changes around local axes
-                thetaY0 = Z0 * elementDir;
-                thetaZ0 = -Y0 * elementDir;     //Negative
-                thetaY1 = Z1 * elementDir;
-                thetaZ1 = -Y1 * elementDir;     //Negative
+                thetaY0 = Vector3d.Multiply(Z0, elementVec) / elementVec.Length;
+                thetaZ0 = -1.0 * Vector3d.Multiply(Y0, elementVec) / elementVec.Length;     //NB! Negative sign
+
+                thetaY1 = Vector3d.Multiply(Z1, elementVec) / elementVec.Length;
+                thetaZ1 = -1.0 * Vector3d.Multiply(Y1, elementVec) / elementVec.Length;     //NB! Negative sign
 
                 //Twist angle change around element axis
-                thetaX = ((Y0 * Z1) - (Y1 * Z0)) / 2.0;
+                thetaX = (Vector3d.Multiply(Y0, Z1) - Vector3d.Multiply(Y1, Z0)) / 2.0;
 
 
                 //Axial
-                double extA = (Math.Pow(currentLength, 2) - Math.Pow(restLength, 2)) / (2.0 * restLength);
-                double extB = (restLength / 60.0) * (4.0 * (Math.Pow(thetaY0, 2) + Math.Pow(thetaZ0, 2)) - 2.0 * ((thetaY0 * thetaY1) + (thetaZ0 * thetaZ1)) + 4.0 * (Math.Pow(thetaY1, 2) + Math.Pow(thetaZ1, 2)));
-                double extension = extA + extB;        //Unit: [m]
 
-                //Element internal forces (referring to 2.1.11 to 2.1.16)
+                //double extA = (Math.Pow(currentLength, 2) - Math.Pow(restLength, 2)) / (2.0 * restLength);
+                //double extB = (restLength / 60.0) * (4.0 * (Math.Pow(thetaY0, 2) + Math.Pow(thetaZ0, 2)) - 2.0 * ((thetaY0 * thetaY1) + (thetaZ0 * thetaZ1)) + 4.0 * (Math.Pow(thetaY1, 2) + Math.Pow(thetaZ1, 2)));
+                //double extension = extA + extB;        //Unit: [m]
+
+                //For now let's use the most simple expression similar to the Bar Goal (the effect from bowing should be relatively small)
+                double extension = currentLength - restLength;        //Unit: [m]
+
+                //Element internal forces
                 N = ((E * A) / restLength) * extension;      // Unit: [N]
                 
-                MY0 = (((N * restLength) / 30.0) * ((4.0 * thetaY0) - thetaY1)) + (((2.0 * E * Iy * 1e-6) / restLength) * ((2.0 * thetaY0) - thetaY1));          //Unit: [Nm]           Check last minus sign; should be + according to Sigrids thesis
-                MY1 = (((N * restLength) / 30.0) * ((4.0 * thetaY1) - thetaY0)) + (((2.0 * E * Iy * 1e-6) / restLength) * ((2.0 * thetaY1) - thetaY0));          //Unit: [Nm]
+                MY0 = ( ((N * restLength) / 30.0) * ((4.0 * thetaY0) - thetaY1) ) + ( ((E * Iy * 1e-6) / restLength) * ((4.0 * thetaY0) + (2.0 * thetaY1)) );           //Unit: [Nm]
+                MZ0 = ( ((N * restLength) / 30.0) * ((4.0 * thetaZ0) - thetaZ1) ) + ( ((E * Iz * 1e-6) / restLength) * ((4.0 * thetaZ0) + (2.0 * thetaZ1)) );           //Unit: [Nm]
 
-                MZ0 = (((N * restLength) / 30.0) * ((4.0 * thetaZ0) - thetaZ1)) + (((2.0 * E * Iz * 1e-6) / restLength) * ((2.0 * thetaZ0) - thetaZ1));          //Unit: [Nm]
-                MZ1 = (((N * restLength) / 30.0) * ((4.0 * thetaZ1) - thetaZ0)) + (((2.0 * E * Iz * 1e-6) / restLength) * ((2.0 * thetaZ1) - thetaZ0));          //Unit: [Nm]
+                MY1 = ( ((N * restLength) / 30.0) * ((4.0 * thetaY1) - thetaY0) ) + ( ((E * Iy * 1e-6) / restLength) * ((4.0 * thetaY1) + (2.0 * thetaY0)) );           //Unit: [Nm]
+                MZ1 = ( ((N * restLength) / 30.0) * ((4.0 * thetaZ1) - thetaZ0) ) + ( ((E * Iz * 1e-6) / restLength) * ((4.0 * thetaZ1) + (2.0 * thetaZ0)) );           //Unit: [Nm]
 
                 MX = ((G * It * 1e-6) / restLength) * thetaX;            //Unit: [Nm]
                 
 
-                //To do: calculate shear forces from moments
+                //TO DO: calculate shear forces from moments
 
-                //Global forces (referring to 2.1.17 to 2.1.20)
+                //Global forces
                 //Force start
                 double F0X = (1.0 / restLength) * ((N * elementVec.X) + (MY0 * Z0.X) - (MZ0 * Y0.X) + (MY1 * Z1.X) - (MZ1 * Y1.X));
                 double F0Y = (1.0 / restLength) * ((N * elementVec.Y) + (MY0 * Z0.Y) - (MZ0 * Y0.Y) + (MY1 * Z1.Y) - (MZ1 * Y1.Y));
@@ -210,18 +231,17 @@ namespace K2Engineering
                 //i=1, j=2, k=3
                 double M0X_pos = (-1.0) * (((MY0 * elementVec.Z * Z0.Y) / restLength) - ((MZ0 * elementVec.Z * Y0.Y) / restLength) + ((MX * ((Y0.Y * Z1.Z) - (Z0.Y * Y1.Z))) / 2.0));
 
-                //i=2, j=3, k=1
-                double M0Y_pos = (-1.0) * (((MY0 * elementVec.X * Z0.Z) / restLength) - ((MZ0 * elementVec.X * Y0.Z) / restLength) + ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
-
-                //i=3, j=1, k=2
-                double M0Z_pos = (-1.0) * (((MY0 * elementVec.Y * Z0.X) / restLength) - ((MZ0 * elementVec.Y * Y0.X) / restLength) + ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
-
-
                 //i=1, j=3, k=2
                 double M0X_neg = (1.0) * (((MY0 * elementVec.Y * Z0.Z) / restLength) - ((MZ0 * elementVec.Y * Y0.Z) / restLength) + ((MX * ((Y0.Z * Z1.Y) - (Z0.Z * Y1.Y))) / 2.0));
 
+                //i=2, j=3, k=1
+                double M0Y_pos = (-1.0) * (((MY0 * elementVec.X * Z0.Z) / restLength) - ((MZ0 * elementVec.X * Y0.Z) / restLength) + ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
+
                 //i=2, j=1, k=3
                 double M0Y_neg = (1.0) * (((MY0 * elementVec.Z * Z0.X) / restLength) - ((MZ0 * elementVec.Z * Y0.X) / restLength) + ((MX * ((Y0.X * Z1.Z) - (Z0.X * Y1.Z))) / 2.0));
+
+                //i=3, j=1, k=2
+                double M0Z_pos = (-1.0) * (((MY0 * elementVec.Y * Z0.X) / restLength) - ((MZ0 * elementVec.Y * Y0.X) / restLength) + ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
 
                 //i=3, j=2, k=1
                 double M0Z_neg = (1.0) * (((MY0 * elementVec.X * Z0.Y) / restLength) - ((MZ0 * elementVec.X * Y0.Y) / restLength) + ((MX * ((Y0.Y * Z1.X) - (Z0.Y * Y1.X))) / 2.0));
@@ -234,18 +254,17 @@ namespace K2Engineering
                 //i=1, j=2, k=3
                 double M1X_pos = (-1.0) * (((MY1 * elementVec.Z * Z1.Y) / restLength) - ((MZ1 * elementVec.Z * Y1.Y) / restLength) - ((MX * ((Y0.Y * Z1.Z) - (Z0.Y * Y1.Z))) / 2.0));
 
-                //i=2, j=3, k=1
-                double M1Y_pos = (-1.0) * (((MY1 * elementVec.X * Z1.Z) / restLength) - ((MZ1 * elementVec.X * Y1.Z) / restLength) - ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
-
-                //i=3, j=1, k=2
-                double M1Z_pos = (-1.0) * (((MY1 * elementVec.Y * Z1.X) / restLength) - ((MZ1 * elementVec.Y * Y1.X) / restLength) - ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
-
-
                 //i=1, j=3, k=2
                 double M1X_neg = (1.0) * (((MY1 * elementVec.Y * Z1.Z) / restLength) - ((MZ1 * elementVec.Y * Y1.Z) / restLength) - ((MX * ((Y0.Z * Z1.Y) - (Z0.Z * Y1.Y))) / 2.0));
 
+                //i=2, j=3, k=1
+                double M1Y_pos = (-1.0) * (((MY1 * elementVec.X * Z1.Z) / restLength) - ((MZ1 * elementVec.X * Y1.Z) / restLength) - ((MX * ((Y0.Z * Z1.X) - (Z0.Z * Y1.X))) / 2.0));
+
                 //i=2, j=1, k=3
                 double M1Y_neg = (1.0) * (((MY1 * elementVec.Z * Z1.X) / restLength) - ((MZ1 * elementVec.Z * Y1.X) / restLength) - ((MX * ((Y0.X * Z1.Z) - (Z0.X * Y1.Z))) / 2.0));
+
+                //i=3, j=1, k=2
+                double M1Z_pos = (-1.0) * (((MY1 * elementVec.Y * Z1.X) / restLength) - ((MZ1 * elementVec.Y * Y1.X) / restLength) - ((MX * ((Y0.X * Z1.Y) - (Z0.X * Y1.Y))) / 2.0));
 
                 //i=3, j=2, k=1
                 double M1Z_neg = (1.0) * (((MY1 * elementVec.X * Z1.Y) / restLength) - ((MZ1 * elementVec.X * Y1.Y) / restLength) - ((MX * ((Y0.Y * Z1.X) - (Z0.Y * Y1.X))) / 2.0));
