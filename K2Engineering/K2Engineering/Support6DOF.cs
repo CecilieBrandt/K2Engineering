@@ -103,13 +103,12 @@ namespace K2Engineering
                 rzFixed = rz;
 
                 PPos = new Point3d[1] {pl.Origin};
-                InitialOrientation = new Plane[1] {pl};
-
                 Move = new Vector3d[1];
                 Weighting = new double[1] {k};
-                
-                Torque = new Vector3d[1];
-                TorqueWeighting = new double[1] {k};
+
+                InitialOrientation = new Plane[3] {pl, pl, pl};
+                Torque = new Vector3d[3];
+                TorqueWeighting = new double[3] {k, k, k};
             }
 
             public override void Calculate(List<KangarooSolver.Particle> p)
@@ -160,21 +159,25 @@ namespace K2Engineering
                 if (!rxFixed)
                 {
                     RX = new Vector3d(0,0,0);
+                    TorqueWeighting[0] = 1.0;
                 }
 
                 if (!ryFixed)
                 {
                     RY = new Vector3d(0, 0, 0);
+                    TorqueWeighting[1] = 1.0;
                 }
 
                 if (!rzFixed)
                 {
                     RZ = new Vector3d(0, 0, 0);
+                    TorqueWeighting[2] = 1.0;
                 }
 
                 //rotation vector
-                Vector3d rotation = RX + RY + RZ;
-                Torque[0] = 0.5*rotation;
+                Torque[0] = RX;
+                Torque[1] = RY;
+                Torque[2] = RZ;
             }
 
             //Output position of support and reaction force. Force in [kN]
@@ -185,6 +188,8 @@ namespace K2Engineering
                 supportData.Add(p[PIndex[0]].Orientation);
                 supportData.Add(Move[0] * Weighting[0] * 1e-3);             //Reaction force in [kN]
                 supportData.Add(Torque[0] * TorqueWeighting[0] * 1e-3);     //Reaction moment in [kNm]
+                supportData.Add(Torque[1] * TorqueWeighting[1] * 1e-3);     //Reaction moment in [kNm]
+                supportData.Add(Torque[2] * TorqueWeighting[2] * 1e-3);     //Reaction moment in [kNm]
 
                 return supportData;
             }

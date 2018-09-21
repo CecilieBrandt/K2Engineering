@@ -31,6 +31,7 @@ namespace K2Engineering
             pManager.AddNumberParameter("Iy", "Iy", "The moment of inertia about the cross section y-axis in [mm4]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Iz", "Iz", "The moment of inertia about the cross section z-axis in [mm4]", GH_ParamAccess.item);
             pManager.AddNumberParameter("It", "It", "The torsional moment of inertia in [mm4]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("TorqueWeighting", "wTorque", "The torque weigting", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -72,9 +73,12 @@ namespace K2Engineering
             double inertiaT = 0.0;
             DA.GetData(7, ref inertiaT);
 
+            double wT = 0.0;
+            DA.GetData(8, ref wT);
+
 
             //Calculate
-            GoalObject beamElement = new BeamGoal(startPln, endPln, eModulus, gModulus, area, inertiaY, inertiaZ, inertiaT);
+            GoalObject beamElement = new BeamGoal(startPln, endPln, eModulus, gModulus, area, inertiaY, inertiaZ, inertiaT, wT);
 
 
             //Output
@@ -96,7 +100,7 @@ namespace K2Engineering
             double N, MY0, MZ0, MY1, MZ1, MX;
 
 
-            public BeamGoal(Plane startPlane, Plane endPlane, double eModulus, double gModulus, double area, double inertiaY, double inertiaZ, double inertiaT)
+            public BeamGoal(Plane startPlane, Plane endPlane, double eModulus, double gModulus, double area, double inertiaY, double inertiaZ, double inertiaT, double wT)
             {
                 restLength = startPlane.Origin.DistanceTo(endPlane.Origin);
                 E = eModulus;
@@ -111,21 +115,9 @@ namespace K2Engineering
                 double axialStiffness = (E * A) / restLength;                               //Unit: N/m
                 int axialDigits = axialStiffness.ToString().Split('.')[0].Length;
 
-                //max bending stiffness
-                /*
-                double bsY = (E * Iy * 1e-6) / restLength;                              //Unit: N*m
-                double bsZ = (E * Iz * 1e-6) / restLength;                              //Unit: N*m 
-
-                double bendingStiffness = bsY;
-                if(bsZ > bsY)
-                {
-                    bendingStiffness = bsZ;
-                }
-                */
-
-                double bendingStiffness = E * Math.Max(Iy, Iz);
-                bendingStiffness *= 0.01;                                                   //Still needs some adjustment to achieve acceptable convergence speed
-                int bendingDigits = bendingStiffness.ToString().Split('.')[0].Length;
+                //double bendingStiffness = E * Math.Max(Iy, Iz);
+                //bendingStiffness *= 0.01;                                                   //Still needs some adjustment to achieve acceptable convergence speed
+                //int bendingDigits = bendingStiffness.ToString().Split('.')[0].Length;
 
 
                 //K2 properties
@@ -134,7 +126,8 @@ namespace K2Engineering
                 Weighting = new double[2] { Math.Pow(10, axialDigits), Math.Pow(10, axialDigits) };           
 
                 Torque = new Vector3d[2];
-                TorqueWeighting = new double[2] { Math.Pow(10, bendingDigits), Math.Pow(10, bendingDigits) };
+                //TorqueWeighting = new double[2] { Math.Pow(10, bendingDigits), Math.Pow(10, bendingDigits) };
+                TorqueWeighting = new double[2] {wT, wT};
 
                 Plane startGlobal = new Plane(startPlane.Origin, Vector3d.XAxis, Vector3d.YAxis);
                 Plane endGlobal = new Plane(endPlane.Origin, Vector3d.XAxis, Vector3d.YAxis);
