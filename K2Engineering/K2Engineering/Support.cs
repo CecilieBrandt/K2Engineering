@@ -86,9 +86,9 @@ namespace K2Engineering
 
             public SupportGoal(Point3d Pt, bool x, bool y, bool z, double k)
             {
-                PPos = new Point3d[1] { Pt };     // PPos must contain an array of the points this goal acts on
-                Move = new Vector3d[1];       // Move is an array of vectors, one for each PPos
-                Weighting = new double[1] { k }; // Weighting is an array of doubles for how strongly the goal affects each point
+                PPos = new Point3d[1] { Pt };
+                Move = new Vector3d[1];
+                Weighting = new double[1] { k };
 
                 Target = Pt;
                 xFixed = x;
@@ -98,7 +98,7 @@ namespace K2Engineering
 
             public override void Calculate(List<KangarooSolver.Particle> p)
             {
-                Point3d currentPt = p[PIndex[0]].Position;             //get the current position of the particle
+                Point3d currentPt = p[PIndex[0]].Position;
                 Vector3d moveTotal = Target - currentPt;
 
                 if (!xFixed)
@@ -119,11 +119,12 @@ namespace K2Engineering
                 Move[0] = moveTotal;
             }
 
+            //Output position of support and reaction force. Force in [kN]
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                var Data = new object[2] { p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3 };                //output support point with reaction force in KN
-
-                return Data;
+                //Create support data object to store output information
+                DataTypes.SupportData supportData = new DataTypes.SupportData(p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3);
+                return supportData;
             }
 
         }

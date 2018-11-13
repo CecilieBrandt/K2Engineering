@@ -6,14 +6,14 @@ using Rhino.Geometry;
 
 namespace K2Engineering
 {
-    public class CastBarOutput : GH_Component
+    public class BarOutput : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the CastBarOutput class.
         /// </summary>
-        public CastBarOutput()
-          : base("CastBarOutput", "BarOutput",
-              "Cast the output of the bar goal",
+        public BarOutput()
+          : base("BarOutput", "BarOutput",
+              "Extract the output of the Bar goal",
               "K2Eng", "6 Utility")
         {
         }
@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("BarOutput", "O", "The output from the bar goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("BarData", "BD", "The BarData from the output of the Bar/Cable goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -45,17 +45,17 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            Object[] output = new Object[4];
-            DA.GetData(0, ref output);
+            DataTypes.BarData barData = new DataTypes.BarData();
+            DA.GetData(0, ref barData);
 
-            //Casting
-            int pIndexStart = (int)output[0];
-            int pIndexEnd = (int)output[1];
+            //Extract properties
+            int pIndexStart = barData.Index1;
+            int pIndexEnd = barData.Index2;
 
-            Line ln = (Line)output[2];
+            Line ln = barData.BarLine;
 
-            double force = (double)output[3];
-            double stress = (double)output[4];
+            double force = barData.Force;
+            double stress = barData.Stress;
 
             //Output
             DA.SetData(0, pIndexStart);

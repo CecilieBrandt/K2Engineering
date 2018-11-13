@@ -60,12 +60,12 @@
     </Reference>
     <Reference Include="Grasshopper">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
+      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="GH_IO">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
+      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -77,21 +77,30 @@
     <Compile Include="BendingVisualisation.cs" />
     <Compile Include="BucklingAnalysis.cs" />
     <Compile Include="Cable.cs" />
-    <Compile Include="CastBarOutput.cs" />
-    <Compile Include="CastLoadOutput.cs" />
-    <Compile Include="CastRodOutput.cs" />
-    <Compile Include="CastSupportOutput.cs" />
+    <Compile Include="BarOutput.cs" />
+    <Compile Include="DataTypes\PressureData.cs" />
+    <Compile Include="LoadOutput.cs" />
+    <Compile Include="Pressure.cs" />
+    <Compile Include="PressureOutput.cs" />
+    <Compile Include="RodOutput.cs" />
+    <Compile Include="SupportOutput.cs" />
     <Compile Include="CircularCS.cs" />
+    <Compile Include="DataTypes\BarData.cs" />
+    <Compile Include="DataTypes\SupportData.cs" />
+    <Compile Include="DataTypes\RodData.cs" />
+    <Compile Include="DataTypes\PointLoadData.cs" />
     <Compile Include="Displacements.cs" />
     <Compile Include="DisplacementVisualisation.cs" />
-    <Compile Include="K2StructuralInfo.cs" />
+    <Compile Include="K2EngineeringInfo.cs" />
     <Compile Include="Load.cs" />
     <Compile Include="LoadVisualisation.cs" />
+    <Compile Include="Materials.cs" />
     <Compile Include="MeshSelfweight.cs" />
     <Compile Include="MeshSnowLoad.cs" />
     <Compile Include="MeshVertexArea.cs" />
     <Compile Include="MeshWindLoad.cs" />
     <Compile Include="PMeshExt.cs" />
+    <Compile Include="Pretension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -186,6 +195,18 @@
   <ItemGroup>
     <None Include="Resources\MeshVertexArea.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Material.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pretension.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pressure.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PressureOutput.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -195,7 +216,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Users\Cecilie Brandt\AppData\Roaming\Grasshopper\Libraries\$(ProjectName).gha"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Users\Cecilie\AppData\Roaming\Grasshopper\Libraries\$(ProjectName).gha"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug32|AnyCPU' ">
     <StartArguments>

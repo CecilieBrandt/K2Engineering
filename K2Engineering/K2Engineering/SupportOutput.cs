@@ -6,14 +6,14 @@ using Rhino.Geometry;
 
 namespace K2Engineering
 {
-    public class CastSupportOutput : GH_Component
+    public class SupportOutput : GH_Component
     {
         /// <summary>
         /// Initializes a new instance of the CastSupportOutput class.
         /// </summary>
-        public CastSupportOutput()
-          : base("CastSupportOutput", "SupportOutput",
-              "Cast the output of the support goal",
+        public SupportOutput()
+          : base("SupportOutput", "SupportOutput",
+              "Extract the output of the Support goal",
               "K2Eng", "6 Utility")
         {
         }
@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("SupportOutput", "O", "The output from the support goal", GH_ParamAccess.item);
+            pManager.AddGenericParameter("SupportData", "SD", "The SupportData from the output of the Support goal", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -42,12 +42,12 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            Object[] output = new Object[2];
-            DA.GetData(0, ref output);
+            DataTypes.SupportData supportData = new DataTypes.SupportData();
+            DA.GetData(0, ref supportData);
 
-            //Casting
-            Point3d pt = (Point3d)output[0];
-            Vector3d reactionForce = (Vector3d)output[1];
+            //Extract properties
+            Point3d pt = supportData.Location;
+            Vector3d reactionForce = supportData.Reaction;
 
             //Output
             DA.SetData(0, pt);
