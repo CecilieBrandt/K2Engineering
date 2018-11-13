@@ -102,14 +102,11 @@ namespace K2Engineering
                 ryFixed = ry;
                 rzFixed = rz;
 
-                PPos = new Point3d[1] {pl.Origin};
-                InitialOrientation = new Plane[1] {pl};
-
-                Move = new Vector3d[1];
-                Weighting = new double[1] {k};
-                
-                Torque = new Vector3d[1];
-                TorqueWeighting = new double[1] {k};
+                PPos = new Point3d[3] {pl.Origin, pl.Origin, pl.Origin};
+                Move = new Vector3d[3];
+                Weighting = new double[3] {k,k,k};
+                Torque = new Vector3d[3];
+                TorqueWeighting = new double[3] {k,k,k}; 
             }
 
             public override void Calculate(List<KangarooSolver.Particle> p)
@@ -133,59 +130,22 @@ namespace K2Engineering
                     translation.Z = 0.0;
                 }
 
-                Move[0] = translation;
+                //Rotation
+                //Needs furhter thinking!
+
+
 
                 
-                //Rotation
-
-                //X-axis rotation vector
-                Vector3d RX = Vector3d.CrossProduct(currentPlane.XAxis, TargetPlane.XAxis);     //vector perpendicular to the two axes (original and updated plane axes)
-                double angleRX = Math.Asin(RX.Length);                                          //angle bewteen the two vectors
-                RX.Unitize();
-                RX *= angleRX;                                                                  //angle-axis representation
-
-                //Y-axis rotation vector
-                Vector3d RY = Vector3d.CrossProduct(currentPlane.YAxis, TargetPlane.YAxis);
-                double angleRY = Math.Asin(RY.Length);
-                RY.Unitize();
-                RY *= angleRY;
-
-                //Z-axis rotation vector
-                Vector3d RZ = Vector3d.CrossProduct(currentPlane.ZAxis, TargetPlane.ZAxis);
-                double angleRZ = Math.Asin(RZ.Length);
-                RZ.Unitize();
-                RZ *= angleRZ;
-
-                //releases
-                if (!rxFixed)
-                {
-                    RX = new Vector3d(0,0,0);
-                }
-
-                if (!ryFixed)
-                {
-                    RY = new Vector3d(0, 0, 0);
-                }
-
-                if (!rzFixed)
-                {
-                    RZ = new Vector3d(0, 0, 0);
-                }
-
-                //rotation vector
-                Vector3d rotation = RX + RY + RZ;
-                Torque[0] = 0.5*rotation;
+                Move[0] = translation.X * Vector3d.XAxis;
+                Move[1] = translation.Y * Vector3d.YAxis;
+                Move[2] = translation.Z * Vector3d.ZAxis;
             }
 
             //Output position of support and reaction force. Force in [kN]
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                //TODO: Create support data object to store output information
-                var supportData = new List<Object>();
-                supportData.Add(p[PIndex[0]].Orientation);
-                supportData.Add(Move[0] * Weighting[0] * 1e-3);             //Reaction force in [kN]
-                supportData.Add(Torque[0] * TorqueWeighting[0] * 1e-3);     //Reaction moment in [kNm]
-
+                //Create support data object to store output information
+                DataTypes.SupportData supportData = new DataTypes.SupportData(p[PIndex[0]].Position, Move[0] * Weighting[0] * 1e-3);
                 return supportData;
             }
         }
