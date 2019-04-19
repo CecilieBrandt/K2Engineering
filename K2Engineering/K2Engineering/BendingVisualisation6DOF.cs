@@ -112,37 +112,54 @@ namespace K2Engineering
 
             //Calculate
 
-
-            //Find max value and scale
+            //Find max value
             double max = 1.0;
+
+            //Shear
+            if (opt == 0 || opt == 1)
+            {
+                double maxVy = Math.Max(Math.Abs(Vy.Min()), Math.Abs(Vy.Max()));
+                double maxVz = Math.Max(Math.Abs(Vz.Min()), Math.Abs(Vz.Max()));
+                max = Math.Max(maxVy, maxVz);
+            }
+
+            //Moment
+            else
+            {
+                double maxMt = Math.Max(Math.Abs(Mt.Min()), Math.Abs(Mt.Max()));
+                double maxMy = Math.Max(Math.Max(Math.Abs(My0.Min()), Math.Abs(My0.Max())), Math.Max(Math.Abs(My1.Min()), Math.Abs(My1.Max())));
+                double maxMz = Math.Max(Math.Max(Math.Abs(Mz0.Min()), Math.Abs(Mz0.Max())), Math.Max(Math.Abs(Mz1.Min()), Math.Abs(Mz1.Max())));
+
+                double[] maxValues = new double[3] { maxMt, maxMy, maxMz };
+                max = maxValues.Max();
+            }
+
+
+            //Scale values
             List<double> startValues = new List<double>();
             List<double> endValues = new List<double>();
 
             //Shear Vy
             if (opt == 0)
             {
-                max = Math.Max( Math.Abs(Vy.Min()), Math.Abs(Vy.Max()) );
                 startValues = endValues = scaleValues(Vy, max, scale);
             }
             
             //Shear Vz
             else if(opt == 1)
             {
-                max = Math.Max( Math.Abs(Vz.Min()), Math.Abs(Vz.Max()) );
                 startValues = endValues = scaleValues(Vz, max, scale);
             }
 
             //Torsion Mt
             else if (opt == 2)
             {
-                max = Math.Max( Math.Abs(Mt.Min()), Math.Abs(Mt.Max()) );
                 startValues = endValues = scaleValues(Mt, max, scale);
             }
 
             //Moment My
             else if (opt == 3)
             {
-                max = Math.Max( Math.Max(Math.Abs(My0.Min()), Math.Abs(My0.Max())), Math.Max(Math.Abs(My1.Min()), Math.Abs(My1.Max())) );
                 startValues = scaleValues(My0, max, scale);
                 endValues = scaleValues(My1, max, scale);
             }
@@ -150,7 +167,6 @@ namespace K2Engineering
             //Moment Mz
             else
             {
-                max = Math.Max( Math.Max(Math.Abs(Mz0.Min()), Math.Abs(Mz0.Max())), Math.Max(Math.Abs(Mz1.Min()), Math.Abs(Mz1.Max())) );
                 startValues = scaleValues(Mz0, max, scale);
                 endValues = scaleValues(Mz1, max, scale);
             }
