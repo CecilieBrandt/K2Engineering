@@ -13,7 +13,7 @@ namespace K2Engineering
         /// </summary>
         public Support6DOF()
           : base("Support6DOF", "Support6DOF",
-              "A 6 DOF support with output of reaction force in [kN] and reaction moment in [kNm]",
+              "A 6 DOF support (global coordinate system) with output of reaction force in [kN] and reaction moment in [kNm]",
               "K2Eng", "1 Supports")
         {
         }
@@ -23,14 +23,14 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("SupportPlane", "pl", "The support plane. By default the support type is set to fully fixed", GH_ParamAccess.item);
+            pManager.AddPointParameter("SupportPt", "pt", "The support point. By default the support type is set to fully fixed", GH_ParamAccess.item);
             pManager.AddBooleanParameter("XFixed", "X", "Set to true if the X direction is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("YFixed", "Y", "Set to true if the Y direction is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("ZFixed", "Z", "Set to true if the Z direction is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("RXFixed", "RX", "Set to true if the rotation about the X axis is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("RYFixed", "RY", "Set to true if the rotation about the Y axis is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("RZFixed", "RZ", "Set to true if the rotation about the Z axis is fixed", GH_ParamAccess.item, true);
-            pManager.AddNumberParameter("Strength", "strength", "The strength of the support", GH_ParamAccess.item, 1e12);
+            pManager.AddNumberParameter("Strength", "strength", "The strength of the support", GH_ParamAccess.item, 1e9);
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace K2Engineering
         protected override void SolveInstance(IGH_DataAccess DA)
         {
             //Input
-            Plane plane = new Plane();
-            DA.GetData(0, ref plane);
+            Point3d pt = new Point3d();
+            DA.GetData(0, ref pt);
 
             bool isXFixed = true;
             DA.GetData(1, ref isXFixed);
@@ -69,14 +69,14 @@ namespace K2Engineering
             bool isRZFixed = true;
             DA.GetData(6, ref isRZFixed);
 
-            double strength = 1e12;
+            double strength = 1e9;
             DA.GetData(7, ref strength);
 
             this.Message = "WIP";
 
 
             //Create support goal
-            GoalObject support = new Support6DOFGoal(plane, isXFixed, isYFixed, isZFixed, isRXFixed, isRYFixed, isRZFixed, strength);
+            GoalObject support = new Support6DOFGoal(pt, isXFixed, isYFixed, isZFixed, isRXFixed, isRYFixed, isRZFixed, strength);
 
 
             //Output
@@ -86,7 +86,7 @@ namespace K2Engineering
         //Define goal
         public class Support6DOFGoal : GoalObject
         {
-            Plane TargetPlane = new Plane();
+            public Plane plnOrig;
             bool xFixed;
             bool yFixed;
             bool zFixed;
@@ -94,9 +94,11 @@ namespace K2Engineering
             bool ryFixed;
             bool rzFixed;
 
-            public Support6DOFGoal(Plane pl, bool x, bool y, bool z, bool rx, bool ry, bool rz, double k)
+            public Support6DOFGoal(Point3d pt, bool x, bool y, bool z, bool rx, bool ry, bool rz, double k)
             {
-                TargetPlane = pl;
+                plnOrig = Plane.WorldXY;
+                plnOrig.Origin = pt;
+
                 xFixed = x;
                 yFixed = y;
                 zFixed = z;
@@ -104,21 +106,21 @@ namespace K2Engineering
                 ryFixed = ry;
                 rzFixed = rz;
 
-                PPos = new Point3d[1] {pl.Origin};
+                PPos = new Point3d[1] {pt};
                 Move = new Vector3d[1];
                 Weighting = new double[1] {k};
 
-                InitialOrientation = new Plane[3] {pl, pl, pl};
-                Torque = new Vector3d[3];
-                TorqueWeighting = new double[3] {k, k, k};
+                InitialOrientation = new Plane[1] { plnOrig };
+                Torque = new Vector3d[1];
+                TorqueWeighting = new double[1] {k};
             }
 
             public override void Calculate(List<KangarooSolver.Particle> p)
             {
-                Plane currentPlane = p[PIndex[0]].Orientation;
+                Plane plnCurrent = p[PIndex[0]].Orientation;
 
                 //Translation
-                Vector3d translation = TargetPlane.Origin - currentPlane.Origin;
+                Vector3d translation = new Vector3d(plnOrig.Origin - plnCurrent.Origin);
                 if (!xFixed)
                 {
                     translation.X = 0.0;
@@ -136,63 +138,45 @@ namespace K2Engineering
 
                 Move[0] = translation;
 
-                
+
                 //Rotation
+                Quaternion q = Quaternion.Rotation(plnCurrent, plnOrig);
 
-                //X-axis rotation vector
-                Vector3d RX = Vector3d.CrossProduct(currentPlane.XAxis, TargetPlane.XAxis);     //vector perpendicular to the two axes (original and updated plane axes)
-                double angleRX = Math.Asin(RX.Length);                                          //angle bewteen the two vectors
-                RX.Unitize();
-                RX *= angleRX;                                                                  //angle-axis representation
+                double angle = new double();
+                Vector3d axis = new Vector3d();
+                q.GetRotation(out angle, out axis);
 
-                //Y-axis rotation vector
-                Vector3d RY = Vector3d.CrossProduct(currentPlane.YAxis, TargetPlane.YAxis);
-                double angleRY = Math.Asin(RY.Length);
-                RY.Unitize();
-                RY *= angleRY;
+                if (angle > Math.PI)
+                {
+                    angle = angle - 2.0 * Math.PI;
+                }
 
-                //Z-axis rotation vector
-                Vector3d RZ = Vector3d.CrossProduct(currentPlane.ZAxis, TargetPlane.ZAxis);
-                double angleRZ = Math.Asin(RZ.Length);
-                RZ.Unitize();
-                RZ *= angleRZ;
+                Vector3d rotation = Vector3d.Multiply(axis, angle);
 
-                //releases
                 if (!rxFixed)
                 {
-                    RX = new Vector3d(0,0,0);
-                    TorqueWeighting[0] = 1.0;
+                    rotation.X = 0.0;
                 }
 
                 if (!ryFixed)
                 {
-                    RY = new Vector3d(0, 0, 0);
-                    TorqueWeighting[1] = 1.0;
+                    rotation.Y = 0.0;
                 }
 
                 if (!rzFixed)
                 {
-                    RZ = new Vector3d(0, 0, 0);
-                    TorqueWeighting[2] = 1.0;
+                    rotation.Z = 0.0;
                 }
 
-                //rotation vector
-                Torque[0] = RX;
-                Torque[1] = RY;
-                Torque[2] = RZ;
+                Torque[0] = rotation;
             }
 
             //Output position of support and reaction force. Force in [kN]
             public override object Output(List<KangarooSolver.Particle> p)
             {
                 Plane pln = p[PIndex[0]].Orientation;
-
                 Vector3d rf = Vector3d.Multiply(Move[0], Weighting[0]) * 1e-3;              //Units [kN]
-
-                Vector3d rm_x = Torque[0] * TorqueWeighting[0] * 1e-3;
-                Vector3d rm_y = Torque[1] * TorqueWeighting[1] * 1e-3;
-                Vector3d rm_z = Torque[2] * TorqueWeighting[2] * 1e-3;
-                Vector3d rm = rm_x + rm_y + rm_z;                                           //Units [kNm]
+                Vector3d rm = Vector3d.Multiply(Torque[0], TorqueWeighting[0]) * 1e-3;      //Units [kNm]
 
                 DataTypes.Support6DOFData supportData = new DataTypes.Support6DOFData(pln, rf, rm);
                 return supportData;

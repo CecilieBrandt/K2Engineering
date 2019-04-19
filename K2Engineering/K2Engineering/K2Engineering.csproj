@@ -83,7 +83,6 @@
     <Compile Include="RodOutput.cs" />
     <Compile Include="Support6DOF.cs" />
     <Compile Include="Support6DOFOutput.cs" />
-    <Compile Include="Support6DOF_fixed.cs" />
     <Compile Include="SupportOutput.cs" />
     <Compile Include="CircularCS.cs" />
     <Compile Include="DataTypes\BarData.cs" />
@@ -114,6 +113,7 @@
     <Compile Include="ShearVisualisation.cs" />
     <Compile Include="StressSum.cs" />
     <Compile Include="Support.cs" />
+    <Compile Include="TransformMoment.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -222,6 +222,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Support6DOFOutput.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TransformMoment.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
