@@ -34,6 +34,8 @@ namespace K2Engineering
             pManager.AddPlaneParameter("P0", "P0", "Local start plane", GH_ParamAccess.item);
             pManager.AddPlaneParameter("P1", "P1", "Local end plane", GH_ParamAccess.item);
             pManager.AddNumberParameter("N", "N", "The normal force in [kN]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Vy", "Vy", "The shear force parallel to the local y-axis in [kN]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Vz", "Vz", "The shear force parallel to the local z-axis in [kN]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Mt", "Mt", "The torsional moment in [kNm]", GH_ParamAccess.item);
             pManager.AddNumberParameter("My0", "My0", "The bending moment about the local y-axis at the start node in [kNm]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Mz0", "Mz0", "The bending moment about the local z-axis at the start node in [kNm]", GH_ParamAccess.item);
@@ -51,15 +53,19 @@ namespace K2Engineering
             DataTypes.BeamData beamData = new DataTypes.BeamData();
             DA.GetData(0, ref beamData);
 
+            this.Message = "WIP";
+
             //Output
             DA.SetData(0, beamData.P0);
             DA.SetData(1, beamData.P1);
             DA.SetData(2, beamData.N);
-            DA.SetData(3, beamData.Mx);
-            DA.SetData(4, beamData.My0);
-            DA.SetData(5, beamData.Mz0);
-            DA.SetData(6, beamData.My1);
-            DA.SetData(7, beamData.Mz1);
+            DA.SetData(3, beamData.Vy);
+            DA.SetData(4, beamData.Vz);
+            DA.SetData(5, beamData.Mx);
+            DA.SetData(6, beamData.My0);
+            DA.SetData(7, beamData.Mz0);
+            DA.SetData(8, beamData.My1);
+            DA.SetData(9, beamData.Mz1);
         }
 
         /// <summary>
@@ -71,7 +77,7 @@ namespace K2Engineering
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.BeamOutput;
             }
         }
 

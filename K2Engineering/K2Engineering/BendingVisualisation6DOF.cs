@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace K2Engineering
 {
-    public class BeamBendingVisualisation : GH_Component
+    public class BendingVisualisation6DOF : GH_Component
     {
 
         //Class properties
@@ -17,9 +17,9 @@ namespace K2Engineering
         /// <summary>
         /// Initializes a new instance of the BeamBendingVisualisation class.
         /// </summary>
-        public BeamBendingVisualisation()
-          : base("BeamBendingVisualisation", "BendingDisplay",
-              "Visualise the bending stress with colour",
+        public BendingVisualisation6DOF()
+          : base("BendingVisualisation6DOF", "BendingDisplay",
+              "Visualise the 6 DOF beam forces/moments",
               "K2Eng", "5 Display")
         {
         }
@@ -31,14 +31,16 @@ namespace K2Engineering
         {
             pManager.AddPlaneParameter("P0", "P0", "Local start plane", GH_ParamAccess.list);
             pManager.AddPlaneParameter("P1", "P1", "Local end plane", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Vy", "Vy", "The shear force parallel the local y-axis in [kN]", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Vz", "Vz", "The shear force parallel the local z-axis in [kN]", GH_ParamAccess.list);
             pManager.AddNumberParameter("Mt", "Mt", "The torsional moment in [kNm]", GH_ParamAccess.list);
             pManager.AddNumberParameter("My0", "My0", "The bending moment about the local y-axis at the start node in [kNm]", GH_ParamAccess.list);
             pManager.AddNumberParameter("Mz0", "Mz0", "The bending moment about the local z-axis at the start node in [kNm]", GH_ParamAccess.list);
             pManager.AddNumberParameter("My1", "My1", "The bending moment about the local y-axis at the end node in [kNm]", GH_ParamAccess.list);
             pManager.AddNumberParameter("Mz1", "Mz1", "The bending moment about the local z-axis at the end node in [kNm]", GH_ParamAccess.list);
-            pManager.AddIntegerParameter("Option", "opt", "0: Mt, 1: My, 2: Mz", GH_ParamAccess.item, 1);
+            pManager.AddIntegerParameter("Option", "opt", "0 = Vy, 1 = Vz, 2 = Mt, 3 = My, 4 = Mz", GH_ParamAccess.item, 3);
             pManager.AddNumberParameter("ScaleFactor", "sc", "The scale factor of the moment diagram", GH_ParamAccess.item, 0.5);
-            pManager.AddColourParameter("Colour", "c", "Bending moment diagram colour", GH_ParamAccess.item, Color.Coral);
+            pManager.AddColourParameter("Colour", "c", "Diagram colour", GH_ParamAccess.item, Color.Coral);
         }
 
         /// <summary>
@@ -61,113 +63,156 @@ namespace K2Engineering
             List<Plane> P1 = new List<Plane>();
             DA.GetDataList(1, P1);
 
+            List<double> Vy = new List<double>();
+            DA.GetDataList(2, Vy);
+
+            List<double> Vz = new List<double>();
+            DA.GetDataList(3, Vz);
+
             List<double> Mt = new List<double>();
-            DA.GetDataList(2, Mt);
+            DA.GetDataList(4, Mt);
 
             List<double> My0 = new List<double>();
-            DA.GetDataList(3, My0);
+            DA.GetDataList(5, My0);
 
             List<double> Mz0 = new List<double>();
-            DA.GetDataList(4, Mz0);
+            DA.GetDataList(6, Mz0);
 
             List<double> My1 = new List<double>();
-            DA.GetDataList(5, My1);
+            DA.GetDataList(7, My1);
 
             List<double> Mz1 = new List<double>();
-            DA.GetDataList(6, Mz1);
+            DA.GetDataList(8, Mz1);
 
-            int opt = 1;
-            DA.GetData(7, ref opt);
+            meshes = new List<Mesh>();
+
+            int opt = 3;
+            DA.GetData(9, ref opt);
             if (opt < 0)
             {
                 opt = 0;
             }
-            else if(opt > 2)
+            else if(opt > 4)
             {
-                opt = 2;
+                opt = 4;
             }
 
             double scale = 0.5;
-            DA.GetData(8, ref scale);
+            DA.GetData(10, ref scale);
             if (scale <= 0.0)
             {
                 scale = 0.1;
             }
 
-            //Global properties
-            meshes = new List<Mesh>();
-            DA.GetData(9, ref color);
+            DA.GetData(11, ref color);
+
+
+            this.Message = "WIP";
 
 
             //Calculate
-            
-            //Find max value in lists and scale accordingly
-            double Mmax = 0.0;
+
+
+            //Find max value and scale
+            double max = 1.0;
+            List<double> startValues = new List<double>();
+            List<double> endValues = new List<double>();
+
+            //Shear Vy
             if (opt == 0)
             {
-                Mmax = Math.Max(Math.Abs(Mt.Min()), Math.Abs(Mt.Max()));
+                max = Math.Max( Math.Abs(Vy.Min()), Math.Abs(Vy.Max()) );
+                startValues = endValues = scaleValues(Vy, max, scale);
             }
+            
+            //Shear Vz
             else if(opt == 1)
             {
-                Mmax = Math.Max(Math.Max(Math.Abs(My0.Min()), Math.Abs(My0.Max())), Math.Max(Math.Abs(My1.Min()), Math.Abs(My1.Max())));
+                max = Math.Max( Math.Abs(Vz.Min()), Math.Abs(Vz.Max()) );
+                startValues = endValues = scaleValues(Vz, max, scale);
             }
+
+            //Torsion Mt
+            else if (opt == 2)
+            {
+                max = Math.Max( Math.Abs(Mt.Min()), Math.Abs(Mt.Max()) );
+                startValues = endValues = scaleValues(Mt, max, scale);
+            }
+
+            //Moment My
+            else if (opt == 3)
+            {
+                max = Math.Max( Math.Max(Math.Abs(My0.Min()), Math.Abs(My0.Max())), Math.Max(Math.Abs(My1.Min()), Math.Abs(My1.Max())) );
+                startValues = scaleValues(My0, max, scale);
+                endValues = scaleValues(My1, max, scale);
+            }
+
+            //Moment Mz
             else
             {
-                Mmax = Math.Max(Math.Max(Math.Abs(Mz0.Min()), Math.Abs(Mz0.Max())), Math.Max(Math.Abs(Mz1.Min()), Math.Abs(Mz1.Max())));
+                max = Math.Max( Math.Max(Math.Abs(Mz0.Min()), Math.Abs(Mz0.Max())), Math.Max(Math.Abs(Mz1.Min()), Math.Abs(Mz1.Max())) );
+                startValues = scaleValues(Mz0, max, scale);
+                endValues = scaleValues(Mz1, max, scale);
             }
 
-            List<double> M0Scaled = new List<double>();
-            List<double> M1Scaled = new List<double>();
+            //Create meshes
             for (int i = 0; i < P0.Count; i++)
             {
-                if (opt == 0)
-                {
-                    M0Scaled.Add((Mt[i] / Mmax) * scale);
-                    M1Scaled.Add((Mt[i] / Mmax) * scale);
-                }
-                else if (opt == 1)
-                {
-                    M0Scaled.Add((My0[i] / Mmax) * scale);
-                    M1Scaled.Add((My1[i] / Mmax) * scale);
-                }
-                else
-                {
-                    M0Scaled.Add((Mz0[i] / Mmax) * scale);
-                    M1Scaled.Add((Mz1[i] / Mmax) * scale);
-                }
-
-            }
-
-            //Run through lists
-            for (int i = 0; i < P0.Count; i++)
-            {
-                //start/end points
+                //General
                 Point3d p0 = P0[i].Origin;
+                Point3d p1 = new Point3d();
+                Point3d p2 = new Point3d();
                 Point3d p3 = P1[i].Origin;
 
-                //Diagram direction
-                Vector3d dir0 = new Vector3d(0,0,0);
-                Vector3d dir1 = new Vector3d(0,0,0);
+                Vector3d dir0 = new Vector3d();
+                Vector3d dir1 = new Vector3d();
+
+                //Shear Vy
                 if (opt == 0)
                 {
-                    dir0 = P0[i].YAxis;
-                    dir1 = P1[i].YAxis;  
+                    dir0 = P0[i].XAxis;
+                    dir1 = P1[i].XAxis;
+                    p1 = p0 + dir0 * startValues[i];
+                    p2 = p3 + dir1 * endValues[i];
                 }
+                
+                //Shear Vz
                 else if (opt == 1)
                 {
                     dir0 = P0[i].YAxis;
                     dir1 = P1[i].YAxis;
+                    p1 = p0 + dir0 * startValues[i];
+                    p2 = p3 + dir1 * endValues[i];
                 }
+
+                //Torsion Mt
+                else if (opt == 2)
+                {
+                    dir0 = P0[i].YAxis;
+                    dir1 = P1[i].YAxis;
+                    p1 = p0 + dir0 * startValues[i];
+                    p2 = p3 + dir1 * endValues[i];
+                }
+
+                //Moment My
+                else if (opt == 3)
+                {
+                    dir0 = -P0[i].YAxis;
+                    dir1 = -P1[i].YAxis;
+                    p1 = p0 + dir0 * startValues[i];
+                    p2 = p3 + dir1 * endValues[i] * (-1);
+                }
+
+                //Moment Mz
                 else
                 {
-                    dir0 = P0[i].XAxis;
-                    dir1 = P1[i].XAxis;
+                    dir0 = -P0[i].XAxis;
+                    dir1 = -P1[i].XAxis;
+                    p1 = p0 + dir0 * startValues[i];
+                    p2 = p3 + dir1 * endValues[i] * (-1);
                 }
 
-                //Middle points
-                Point3d p1 = p0 + dir0 * M0Scaled[i];
-                Point3d p2 = p3 + dir1 * M1Scaled[i] * (-1);
-
+                //Create diagram mesh
                 Mesh m = new Mesh();
                 m.Vertices.Add(p0);
                 m.Vertices.Add(p1);
@@ -178,6 +223,20 @@ namespace K2Engineering
                 meshes.Add(m);
             }
 
+        }
+
+        //Scale values in list
+        List<double> scaleValues(List<double> values, double max, double tmap)
+        {
+            List<double> valuesScaled = new List<double>();
+
+            for(int i=0; i<values.Count; i++)
+            {
+                double val = (values[i] / max) * tmap;
+                valuesScaled.Add(val);
+            }
+
+            return valuesScaled;
         }
 
         //Preview meshes in Rhino
@@ -198,7 +257,7 @@ namespace K2Engineering
                     if (mesh != null && mesh.IsValid)
                     {
                         args.Display.DrawMeshShaded(mesh, mat);
-                        args.Display.DrawMeshWires(mesh, color);
+                        args.Display.DrawMeshWires(mesh, Color.White);
                     }
                 }
             }
@@ -213,7 +272,7 @@ namespace K2Engineering
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.BeamDisplay;
             }
         }
 

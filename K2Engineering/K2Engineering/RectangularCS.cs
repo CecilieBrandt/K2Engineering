@@ -23,8 +23,8 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddNumberParameter("Width", "w", "The larger value of the rectangle dimensions in mm", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Height", "h", "The smaller value of the rectangle dimensions in mm", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Width", "w", "The width of the cross section [mm]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Height", "h", "The height of the cross section [mm]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Thickness", "t", "The thickness of the cross section in mm. If nothing specified, the default is a solid", GH_ParamAccess.item);
             pManager[2].Optional = true;
         }
@@ -34,9 +34,10 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddNumberParameter("Area", "A", "Cross section area in mm2", GH_ParamAccess.item);
-            pManager.AddNumberParameter("Inertia", "I", "Second moment of area in mm4", GH_ParamAccess.item);
-            pManager.AddNumberParameter("ZDist", "z", "The distance to the outer fibre in mm", GH_ParamAccess.item);
+            pManager.AddNumberParameter("A", "A", "Cross section area [mm2]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Iy", "Iy", "Moment of inertia about the local y-axis [mm4]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Iz", "Iz", "Moment of inertia about the local z-axis [mm4]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("It", "It", "Torsional moment of inertia about the local x-axis [mm4]", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -58,14 +59,16 @@ namespace K2Engineering
 
             //Calculate
             double a = calcArea(w, h, t);
-            double i = calcInertia(w, h, t);
-            double z = h / 2.0;
+            double iy = calcInertia(w, h, t);
+            double iz = calcInertia(h, w, t);
+            double it = iy + iz;
 
 
             //Output
             DA.SetData(0, a);
-            DA.SetData(1, i);
-            DA.SetData(2, z);
+            DA.SetData(1, iy);
+            DA.SetData(2, iz);
+            DA.SetData(3, it);
         }
 
         //Methods
@@ -84,7 +87,7 @@ namespace K2Engineering
             return area;
         }
 
-        //Calculate second moment of area
+        //Calculate moment of inertia
         double calcInertia(double w, double h, double t)
         {
             double inertia = (1 / 12.0) * w * Math.Pow(h, 3);

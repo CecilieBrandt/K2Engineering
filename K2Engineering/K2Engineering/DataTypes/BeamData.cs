@@ -12,6 +12,8 @@ namespace K2Engineering.DataTypes
         public Plane P0;
         public Plane P1;
         public double N;
+        public double Vy;
+        public double Vz;
         public double Mx;
         public double My0;
         public double Mz0;
@@ -22,11 +24,13 @@ namespace K2Engineering.DataTypes
         {
         }
 
-        public BeamData(Plane p0, Plane p1, double n, double mx, double my0, double mz0, double my1, double mz1)
+        public BeamData(Plane p0, Plane p1, double n, double vy, double vz, double mx, double my0, double mz0, double my1, double mz1)
         {
             P0 = p0;
             P1 = p1;
             N = n;
+            Vy = vy;
+            Vz = vz;
             Mx = mx;
             My0 = my0;
             Mz0 = mz0;

@@ -13,7 +13,7 @@ namespace K2Engineering
         /// </summary>
         public Support6DOF()
           : base("Support6DOF", "Support6DOF",
-              "A support with output of reaction force in [kN] and reaction moment in [kNm]",
+              "A 6 DOF support with output of reaction force in [kN] and reaction moment in [kNm]",
               "K2Eng", "1 Supports")
         {
         }
@@ -23,14 +23,14 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("SupportPlane", "pl", "The global support plane. By default the support type is set to rigid", GH_ParamAccess.item);
+            pManager.AddPlaneParameter("SupportPlane", "pl", "The support plane. By default the support type is set to fully fixed", GH_ParamAccess.item);
             pManager.AddBooleanParameter("XFixed", "X", "Set to true if the X direction is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("YFixed", "Y", "Set to true if the Y direction is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("ZFixed", "Z", "Set to true if the Z direction is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("RXFixed", "RX", "Set to true if the rotation about the X axis is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("RYFixed", "RY", "Set to true if the rotation about the Y axis is fixed", GH_ParamAccess.item, true);
             pManager.AddBooleanParameter("RZFixed", "RZ", "Set to true if the rotation about the Z axis is fixed", GH_ParamAccess.item, true);
-            pManager.AddNumberParameter("Strength", "strength", "The strength of a spring to fix the point in the desired directions", GH_ParamAccess.item, 1e15);
+            pManager.AddNumberParameter("Strength", "strength", "The strength of the support", GH_ParamAccess.item, 1e12);
         }
 
         /// <summary>
@@ -69,12 +69,14 @@ namespace K2Engineering
             bool isRZFixed = true;
             DA.GetData(6, ref isRZFixed);
 
-            double weight = 1.0;
-            DA.GetData(7, ref weight);
+            double strength = 1e12;
+            DA.GetData(7, ref strength);
+
+            this.Message = "WIP";
 
 
             //Create support goal
-            GoalObject support = new Support6DOFGoal(plane, isXFixed, isYFixed, isZFixed, isRXFixed, isRYFixed, isRZFixed, weight);
+            GoalObject support = new Support6DOFGoal(plane, isXFixed, isYFixed, isZFixed, isRXFixed, isRYFixed, isRZFixed, strength);
 
 
             //Output
@@ -183,14 +185,16 @@ namespace K2Engineering
             //Output position of support and reaction force. Force in [kN]
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                //TODO: Create support data object to store output information
-                var supportData = new List<Object>();
-                supportData.Add(p[PIndex[0]].Orientation);
-                supportData.Add(Move[0] * Weighting[0] * 1e-3);             //Reaction force in [kN]
-                supportData.Add(Torque[0] * TorqueWeighting[0] * 1e-3);     //Reaction moment in [kNm]
-                supportData.Add(Torque[1] * TorqueWeighting[1] * 1e-3);     //Reaction moment in [kNm]
-                supportData.Add(Torque[2] * TorqueWeighting[2] * 1e-3);     //Reaction moment in [kNm]
+                Plane pln = p[PIndex[0]].Orientation;
 
+                Vector3d rf = Vector3d.Multiply(Move[0], Weighting[0]) * 1e-3;              //Units [kN]
+
+                Vector3d rm_x = Torque[0] * TorqueWeighting[0] * 1e-3;
+                Vector3d rm_y = Torque[1] * TorqueWeighting[1] * 1e-3;
+                Vector3d rm_z = Torque[2] * TorqueWeighting[2] * 1e-3;
+                Vector3d rm = rm_x + rm_y + rm_z;                                           //Units [kNm]
+
+                DataTypes.Support6DOFData supportData = new DataTypes.Support6DOFData(pln, rf, rm);
                 return supportData;
             }
         }
@@ -204,7 +208,7 @@ namespace K2Engineering
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Support6DOF;
             }
         }
 

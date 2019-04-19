@@ -28,8 +28,9 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "ln", "The lines to display", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Axial stresses", "stressA", "The axial stresses", GH_ParamAccess.list);
+            pManager.AddLineParameter("Line", "Ln", "The lines to display", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Axial forces", "F", "The axial forces", GH_ParamAccess.list);
+            pManager.AddIntegerParameter("ThicknessMax", "tmax", "The maximum line thickness", GH_ParamAccess.item, 10);
         }
 
         /// <summary>
@@ -49,10 +50,12 @@ namespace K2Engineering
             lines = new List<Line>();
             if (!DA.GetDataList(0, lines)) { return; }
             if(lines == null || lines.Count == 0) { return; }
-            
 
             List<double> stresses = new List<double>();
             if (!DA.GetDataList(1, stresses)) { return; }
+
+            int tmax = 10;
+            DA.GetData(2, ref tmax);
 
 
 
@@ -105,12 +108,12 @@ namespace K2Engineering
             double stressRange = maxStress - minStress;
 
             //Remap stress values to line widths if the stress range is not constant
-            int widthMin = 2;
-            int widthMax = 7;
+            int widthMin = 1;
+            int widthMax = tmax;
 
             foreach (int s in stressesInt)
             {
-                int tMap = 2;       //default thickness in pixels in case of constant stress values
+                int tMap = 2;       //default thickness in case of constant stress values
 
                 if (stressRange != 0.0)
                 {

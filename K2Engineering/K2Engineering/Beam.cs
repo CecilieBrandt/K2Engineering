@@ -13,7 +13,7 @@ namespace K2Engineering
         /// </summary>
         public Beam()
           : base("Beam", "Beam",
-              "A goal that represents a beam element with biaxial bending and torsion behaviour",
+              "A goal that represents a beam element with biaxial bending and torsion behaviour. WORK IN PROGRESS",
               "K2Eng", "0 Elements")
         {
         }
@@ -23,15 +23,14 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddPlaneParameter("StartPlane", "startPln", "The start plane of the beam (model in [m])", GH_ParamAccess.item);
-            pManager.AddPlaneParameter("EndPlane", "endPln", "The end plane of the beam (model in [m])", GH_ParamAccess.item);
+            pManager.AddPlaneParameter("StartPlane", "startPln", "The start plane of the beam (model in [m]). Red axis corresponds to the local y-axis of the cross section and green axis to the local z-axis", GH_ParamAccess.item);
+            pManager.AddPlaneParameter("EndPlane", "endPln", "The end plane of the beam (model in [m]). Red axis corresponds to the local y-axis of the cross section and green axis to the local z-axis", GH_ParamAccess.item);
             pManager.AddNumberParameter("E-modulus", "E", "Young's modulus in [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("G-modulus", "G", "The shear modulus in [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("A", "A", "The cross section area in [mm2]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Iy", "Iy", "The moment of inertia about the cross section y-axis in [mm4]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Iz", "Iz", "The moment of inertia about the cross section z-axis in [mm4]", GH_ParamAccess.item);
             pManager.AddNumberParameter("It", "It", "The torsional moment of inertia in [mm4]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("TorqueWeighting", "wTorque", "The torque weigting", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -73,12 +72,11 @@ namespace K2Engineering
             double inertiaT = 0.0;
             DA.GetData(7, ref inertiaT);
 
-            double wT = 0.0;
-            DA.GetData(8, ref wT);
+            this.Message = "WIP";
 
 
             //Calculate
-            GoalObject beamElement = new BeamGoal(startPln, endPln, eModulus, gModulus, area, inertiaY, inertiaZ, inertiaT, wT);
+            GoalObject beamElement = new BeamGoal(startPln, endPln, eModulus, gModulus, area, inertiaY, inertiaZ, inertiaT);
 
 
             //Output
@@ -97,10 +95,10 @@ namespace K2Engineering
             double E, G, A, Iy, Iz, It;
             double thetaY0, thetaZ0, thetaY1, thetaZ1, thetaX;
 
-            double N, MY0, MZ0, MY1, MZ1, MX;
+            double N, VY, VZ, MY0, MZ0, MY1, MZ1, MX;
 
 
-            public BeamGoal(Plane startPlane, Plane endPlane, double eModulus, double gModulus, double area, double inertiaY, double inertiaZ, double inertiaT, double wT)
+            public BeamGoal(Plane startPlane, Plane endPlane, double eModulus, double gModulus, double area, double inertiaY, double inertiaZ, double inertiaT)
             {
                 restLength = startPlane.Origin.DistanceTo(endPlane.Origin);
                 E = eModulus;
@@ -115,9 +113,9 @@ namespace K2Engineering
                 double axialStiffness = (E * A) / restLength;                               //Unit: N/m
                 int axialDigits = axialStiffness.ToString().Split('.')[0].Length;
 
-                //double bendingStiffness = E * Math.Max(Iy, Iz);
-                //bendingStiffness *= 0.01;                                                   //Still needs some adjustment to achieve acceptable convergence speed
-                //int bendingDigits = bendingStiffness.ToString().Split('.')[0].Length;
+                double bendingStiffness = E * Math.Max(Iy, Iz);
+                bendingStiffness *= 0.001;                                                   //Still needs some adjustment to achieve acceptable convergence speed
+                int bendingDigits = bendingStiffness.ToString().Split('.')[0].Length;
 
 
                 //K2 properties
@@ -126,8 +124,7 @@ namespace K2Engineering
                 Weighting = new double[2] { Math.Pow(10, axialDigits), Math.Pow(10, axialDigits) };           
 
                 Torque = new Vector3d[2];
-                //TorqueWeighting = new double[2] { Math.Pow(10, bendingDigits), Math.Pow(10, bendingDigits) };
-                TorqueWeighting = new double[2] {wT, wT};
+                TorqueWeighting = new double[2] { Math.Pow(10, bendingDigits), Math.Pow(10, bendingDigits) };
 
                 Plane startGlobal = new Plane(startPlane.Origin, Vector3d.XAxis, Vector3d.YAxis);
                 Plane endGlobal = new Plane(endPlane.Origin, Vector3d.XAxis, Vector3d.YAxis);
@@ -203,9 +200,12 @@ namespace K2Engineering
                 MZ1 = ( ((N * restLength) / 30.0) * ((4.0 * thetaZ1) - thetaZ0) ) + ( ((E * Iz * 1e-6) / restLength) * ((4.0 * thetaZ1) + (2.0 * thetaZ0)) );           //Unit: [Nm]
 
                 MX = ((G * It * 1e-6) / restLength) * thetaX;            //Unit: [Nm]
-                
 
-                //TO DO: calculate shear forces from moments
+
+                //Calculate shear forces from moments
+                VY = (MZ1 + MZ0) / restLength;                          //Unit: [N]
+                VZ = (MY1 + MY0) / restLength;                          //Unit: [N]
+
 
                 //Global forces
                 //Force start
@@ -278,7 +278,7 @@ namespace K2Engineering
             //Output moment in [kNm] and normal force/shear in [kN]
             public override object Output(List<KangarooSolver.Particle> p)
             {
-                DataTypes.BeamData beamData = new DataTypes.BeamData(P0R, P1R, Math.Round(N * 1e-3, 3), Math.Round(MX * 1e-3, 3), Math.Round(MY0 * 1e-3, 3), Math.Round(MZ0 * 1e-3, 3), Math.Round(MY1 * 1e-3, 3), Math.Round(MZ1 * 1e-3, 3));
+                DataTypes.BeamData beamData = new DataTypes.BeamData(P0R, P1R, Math.Round(N * 1e-3, 3), Math.Round(VY * 1e-3, 3), Math.Round(VZ * 1e-3, 3), Math.Round(MX * 1e-3, 3), Math.Round(MY0 * 1e-3, 3), Math.Round(MZ0 * 1e-3, 3), Math.Round(MY1 * 1e-3, 3), Math.Round(MZ1 * 1e-3, 3));
                 return beamData;
             }
 
@@ -295,7 +295,7 @@ namespace K2Engineering
             {
                 //You can add image files to your project resources and access them like this:
                 // return Resources.IconForThisComponent;
-                return null;
+                return Properties.Resources.Beam;
             }
         }
 
