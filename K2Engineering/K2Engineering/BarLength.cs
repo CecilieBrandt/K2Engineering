@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Bars", "bars", "Bar elements", GH_ParamAccess.list);
+            pManager.AddLineParameter("Bars", "bars", "Bar elements. Make sure that the Rhino model is set to units in [m]", GH_ParamAccess.list);
         }
 
         /// <summary>

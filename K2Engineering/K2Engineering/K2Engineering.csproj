@@ -43,46 +43,46 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="KangarooSolver">
-      <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\KangarooSolver.dll</HintPath>
+    <Reference Include="GH_IO">
+      <HintPath>..\..\..\..\..\..\..\Program Files\Rhino 6\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
+    </Reference>
+    <Reference Include="Grasshopper">
+      <HintPath>..\..\..\..\..\..\..\Program Files\Rhino 6\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
+    </Reference>
+    <Reference Include="KangarooSolver, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Rhino 6\Plug-ins\Grasshopper\Components\KangarooSolver.dll</HintPath>
     </Reference>
     <Reference Include="Plankton">
       <HintPath>..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\Plankton.dll</HintPath>
+    </Reference>
+    <Reference Include="RhinoCommon">
+      <HintPath>..\..\..\..\..\..\..\Program Files\Rhino 6\System\RhinoCommon.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="RhinoCommon">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Rhinoceros 5\System\rhinocommon.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Grasshopper">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\Grasshopper.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GH_IO">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\AppData\Roaming\McNeel\Rhinoceros\5.0\Plug-ins\Grasshopper (b45a29b1-4343-4035-989e-044e8580d9cf)\0.9.76.0\GH_IO.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AxialVisualisation.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="BarLength.cs" />
     <Compile Include="BarSelfweight.cs" />
+    <Compile Include="Beam.cs" />
+    <Compile Include="BendingVisualisation6DOF.cs" />
+    <Compile Include="BeamOrientation.cs" />
+    <Compile Include="BeamOutput.cs" />
     <Compile Include="BendingVisualisation.cs" />
     <Compile Include="BucklingAnalysis.cs" />
     <Compile Include="Cable.cs" />
     <Compile Include="BarOutput.cs" />
-    <Compile Include="DataTypes\PressureData.cs" />
+    <Compile Include="DataTypes\BeamData.cs" />
+    <Compile Include="DataTypes\Support6DOFData.cs" />
     <Compile Include="LoadOutput.cs" />
-    <Compile Include="Pressure.cs" />
-    <Compile Include="PressureOutput.cs" />
     <Compile Include="RodOutput.cs" />
+    <Compile Include="Support6DOF.cs" />
+    <Compile Include="Support6DOFOutput.cs" />
     <Compile Include="SupportOutput.cs" />
     <Compile Include="CircularCS.cs" />
     <Compile Include="DataTypes\BarData.cs" />
@@ -113,6 +113,7 @@
     <Compile Include="ShearVisualisation.cs" />
     <Compile Include="StressSum.cs" />
     <Compile Include="Support.cs" />
+    <Compile Include="TransformMoment.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -202,10 +203,28 @@
     <None Include="Resources\Pretension.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Pressure.png" />
+    <None Include="Resources\Beam.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\PressureOutput.png" />
+    <None Include="Resources\BeamDisplay.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BeamOutput.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Orient.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Support6DOF.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Support6DOF_fixed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Support6DOFOutput.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TransformMoment.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

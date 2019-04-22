@@ -199,10 +199,25 @@
   <data name="Pretension" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Pretension.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Pressure" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Pressure.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Beam" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Beam.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="PressureOutput" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PressureOutput.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="BeamDisplay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\BeamDisplay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BeamOutput" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\BeamOutput.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Orient" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Orient.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Support6DOF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Support6DOF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Support6DOFOutput" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Support6DOFOutput.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TransformMoment" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\TransformMoment.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
