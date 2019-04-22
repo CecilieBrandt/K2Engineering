@@ -78,8 +78,11 @@
     <Compile Include="Cable.cs" />
     <Compile Include="BarOutput.cs" />
     <Compile Include="DataTypes\BeamData.cs" />
+    <Compile Include="DataTypes\PressureData.cs" />
     <Compile Include="DataTypes\Support6DOFData.cs" />
     <Compile Include="LoadOutput.cs" />
+    <Compile Include="Pressure.cs" />
+    <Compile Include="PressureOutput.cs" />
     <Compile Include="RodOutput.cs" />
     <Compile Include="Support6DOF.cs" />
     <Compile Include="Support6DOFOutput.cs" />
@@ -225,6 +228,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\TransformMoment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Pressure.png" />
+    <Content Include="Resources\PressureOutput.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
