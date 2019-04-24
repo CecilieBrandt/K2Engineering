@@ -22,7 +22,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddIntegerParameter("MaterialIndex", "MatId", "0:Steel, 1:Aluminium, 2:Timber, 3:ETFE, 4:GFRP, 5:Carbon fiber, 6:Kevlar, 7:Dyneema", GH_ParamAccess.item, 0);
+            pManager.AddIntegerParameter("MaterialIndex", "MatId", "0=Steel, 1=Aluminium, 2=Timber, 3=ETFE, 4=GFRP, 5=Carbon fiber, 6=Kevlar, 7=Dyneema", GH_ParamAccess.item, 0);
         }
 
         /// <summary>
@@ -33,6 +33,7 @@ namespace K2Engineering
             pManager.AddTextParameter("Material name", "Name", "The name of the material", GH_ParamAccess.item);
             pManager.AddNumberParameter("Density", "rho", "The density of the material in [kg/m3]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Young's Modulus", "E", "Young's Modulus in [MPa]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("Shear Modulus", "G", "Shear Modulus in [MPa]", GH_ParamAccess.item);
             pManager.AddNumberParameter("Strength", "fy", "The yield strength of the material in [MPa]", GH_ParamAccess.item);
         }
 
@@ -51,6 +52,7 @@ namespace K2Engineering
             string name;
             double density;
             double E;
+            double G;
             double fy;
 
             //Steel
@@ -59,6 +61,7 @@ namespace K2Engineering
                 name = "Steel (S355)";
                 density = 7850;
                 E = 2.1e5;
+                G = 0.81e5;
                 fy = 355;
             }
 
@@ -68,6 +71,7 @@ namespace K2Engineering
                 name = "Aluminium (6061-T6)";
                 density = 2700;
                 E = 70e3;
+                G = 27e3;
                 fy = 240;
             }
 
@@ -77,6 +81,7 @@ namespace K2Engineering
                 name = "Birch plywood (t=6.5 mm)";
                 density = 680;
                 E = (12737 + 4763) / 2.0;
+                G = 620;
                 fy = (50.9 + 29) / 2.0;
 
                 //www.metsateollisuus.fi/uploads/2017/03/30041750/887.pdf
@@ -88,6 +93,7 @@ namespace K2Engineering
                 name = "ETFE";
                 density = 1750;
                 E = 965;
+                G = 0.0;
                 fy = 48;
 
                 //www.pronatindustries.com/wp-content/uploads/2015/03/Norton-ETFE.pdf
@@ -99,6 +105,7 @@ namespace K2Engineering
                 name = "GFRP";
                 density = 2100;
                 E = 40e3;
+                G = 3e3;
                 fy = 900;
                 
                 //www.fibrolux.com/main/knowledge/properties
@@ -110,6 +117,7 @@ namespace K2Engineering
                 name = "Carbon fiber";
                 density = 1760;
                 E = 230e3;
+                G = 3e3;
                 fy = 3500;
 
                 //www.siltex.eu/wp-content/uploads/2011/03/Carbon-Data-Sheet.pdf
@@ -121,6 +129,7 @@ namespace K2Engineering
                 name = "Kevlar (49)";
                 density = 1440;
                 E = 112.4e3;
+                G = 3e3;
                 fy = 2800;
 
                 //www.dupont.com/content/dam/dupont/products-and-services/fabrics-fibers-and-nonwovens/fibers/documents/Kevlar_Technical_Guide.pdf
@@ -132,6 +141,7 @@ namespace K2Engineering
                 name = "Dyneema";
                 density = 980;
                 E = 116e3;
+                G = 3e3;
                 fy = 3600;
 
                 //www.issuu.com/eurofibers/docs/name8f0d44
@@ -142,7 +152,8 @@ namespace K2Engineering
             DA.SetData(0, name);
             DA.SetData(1, density);
             DA.SetData(2, E);
-            DA.SetData(3, fy);
+            DA.SetData(3, G);
+            DA.SetData(4, fy);
         }
 
         /// <summary>
