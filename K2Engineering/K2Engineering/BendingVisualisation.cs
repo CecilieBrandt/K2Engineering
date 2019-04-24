@@ -30,7 +30,7 @@ namespace K2Engineering
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddPlaneParameter("Bending planes", "pl", "The bending planes", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Bending stresses", "stressB", "The bending stresses", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Bending moments", "M", "The bending moments", GH_ParamAccess.list);
             pManager.AddNumberParameter("ScaleFactor", "sc", "The scale factor of the lines", GH_ParamAccess.item, 0.5);
         }
 
@@ -51,8 +51,8 @@ namespace K2Engineering
             List<Plane> planes = new List<Plane>();
             if (!DA.GetDataList(0, planes)) { return; }
 
-            List<double> stresses = new List<double>();
-            if (!DA.GetDataList(1, stresses)) { return; }
+            List<double> moments = new List<double>();
+            if (!DA.GetDataList(1, moments)) { return; }
 
             double scale = 1.0;
             DA.GetData(2, ref scale);
@@ -67,32 +67,32 @@ namespace K2Engineering
             double lengthMax = 1.0 * scale;
             double lengthMin = 0.1 * scale;
 
-            double minStress = stresses.Min();
-            double maxStress = stresses.Max();
-            double stressRange = maxStress - minStress;
+            double momentMin = moments.Min();
+            double momentMax = moments.Max();
+            double momentRange = momentMax - momentMin;
 
             //if the min stress is zero then the smallest length is zero
-            if (Math.Round(minStress, 1) == 0.0)
+            if (Math.Round(momentMin, 1) == 0.0)
             {
                 lengthMin = 0.0;
             }
 
 
-            for (int i = 0; i < stresses.Count; i++)
+            for (int i = 0; i < moments.Count; i++)
             {
                 //in case of constant stress (not equal to zero)
                 int tMapColour = Convert.ToInt32(colourMax / 2.0);
                 double tMapLength = lengthMax / 2.0;
 
                 //If both max and min stress equals zero then the length is constant zero
-                if (Math.Round(maxStress, 1) == 0.0 && Math.Round(minStress, 1) == 0.0)
+                if (Math.Round(momentMax, 1) == 0.0 && Math.Round(momentMin, 1) == 0.0)
                 {
                     tMapLength = 0.0;
                 }
 
-                else if (Math.Round(stressRange, 1) != 0.0)
+                else if (Math.Round(momentRange, 1) != 0.0)
                 {
-                    double t = (stresses[i] - minStress) / stressRange;
+                    double t = (moments[i] - momentMin) / momentRange;
                     tMapColour = Convert.ToInt32(t * (colourMax - colourMin) + colourMin);
                     tMapLength = t * (lengthMax - lengthMin) + lengthMin;
                 }

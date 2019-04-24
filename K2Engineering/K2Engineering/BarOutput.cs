@@ -31,11 +31,9 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddIntegerParameter("PIndexStart", "PI0", "The start particle index of a bar element", GH_ParamAccess.item);
-            pManager.AddIntegerParameter("PIndexEnd", "PI1", "The end particle index of a bar element", GH_ParamAccess.item);
-            pManager.AddLineParameter("Line", "ln", "The updated line geometry", GH_ParamAccess.item);
+            pManager.AddLineParameter("Line", "Ln", "The updated line geometry", GH_ParamAccess.item);
             pManager.AddNumberParameter("AxialForce", "F", "The axial force [kN] in the bar (- is compression)", GH_ParamAccess.item);
-            pManager.AddNumberParameter("AxialStress", "stressA", "The axial stress [MPa] in the bar (- is compression)", GH_ParamAccess.item);
+            pManager.AddNumberParameter("AxialStress", "sigmaA", "The axial stress [MPa] in the bar (- is compression)", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -49,20 +47,14 @@ namespace K2Engineering
             DA.GetData(0, ref barData);
 
             //Extract properties
-            int pIndexStart = barData.Index1;
-            int pIndexEnd = barData.Index2;
-
             Line ln = barData.BarLine;
-
             double force = barData.Force;
             double stress = barData.Stress;
 
             //Output
-            DA.SetData(0, pIndexStart);
-            DA.SetData(1, pIndexEnd);
-            DA.SetData(2, ln);
-            DA.SetData(3, Math.Round(force,6));
-            DA.SetData(4, Math.Round(stress,3));
+            DA.SetData(0, ln);
+            DA.SetData(1, Math.Round(force,6));
+            DA.SetData(2, Math.Round(stress,3));
         }
 
         /// <summary>

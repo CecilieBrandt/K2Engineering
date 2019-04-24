@@ -30,7 +30,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "ln", "Line segments", GH_ParamAccess.list);
+            pManager.AddLineParameter("Line", "Ln", "Line segments", GH_ParamAccess.list);
             pManager.AddVectorParameter("ShearVectors", "V", "Shear vector for each line segment", GH_ParamAccess.list);
             pManager.AddNumberParameter("ScaleFactor", "sc", "A scale factor", GH_ParamAccess.item, 0.5);
         }

@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Line", "ln", "Line segment in [m]", GH_ParamAccess.list);
+            pManager.AddLineParameter("Line", "Ln", "Line segment in [m]", GH_ParamAccess.list);
             pManager.AddNumberParameter("BendingMoment", "M", "The bending moments in [kNm]", GH_ParamAccess.list);
             pManager.AddPlaneParameter("BendingPlane", "pl", "The bending planes", GH_ParamAccess.list);
         }

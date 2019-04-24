@@ -31,10 +31,9 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
         {
-            pManager.AddIntegerParameter("PIndexBending", "PI12", "The particle index associated with the calculated moment", GH_ParamAccess.item);
             pManager.AddPlaneParameter("Plane", "pl", "The bending plane", GH_ParamAccess.item);
             pManager.AddNumberParameter("BendingMoment", "M", "The bending moment [kNm]", GH_ParamAccess.item);
-            pManager.AddNumberParameter("BendingStress", "stressB", "The bending stress [MPa]", GH_ParamAccess.item);
+            pManager.AddNumberParameter("BendingStress", "sigmaB", "The bending stress [MPa]", GH_ParamAccess.item);
         }
 
         /// <summary>
@@ -48,16 +47,14 @@ namespace K2Engineering
             DA.GetData(0, ref rodData);
 
             //Extract properties
-            int PIndex = rodData.SharedPointIndex;
             Plane pl = rodData.BendingPlane;
             double moment = rodData.Moment;
             double stress = rodData.BendingStress;
 
             //Output
-            DA.SetData(0, PIndex);
-            DA.SetData(1, pl);
-            DA.SetData(2, Math.Round(moment,9));
-            DA.SetData(3, Math.Round(stress,3));
+            DA.SetData(0, pl);
+            DA.SetData(1, Math.Round(moment,9));
+            DA.SetData(2, Math.Round(stress,3));
         }
 
         /// <summary>

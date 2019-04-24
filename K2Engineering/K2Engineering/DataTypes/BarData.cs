@@ -9,8 +9,6 @@ namespace K2Engineering.DataTypes
 {
     public class BarData
     {
-        public int Index1;
-        public int Index2;
         public Line BarLine;
         public double Force;
         public double Stress;
@@ -19,10 +17,8 @@ namespace K2Engineering.DataTypes
         {
         }
 
-        public BarData(int index1, int index2, Line barLine, double force, double stress)
+        public BarData(Line barLine, double force, double stress)
         {
-            Index1 = index1;
-            Index2 = index2;
             BarLine = barLine;
             Force = force;
             Stress = stress;

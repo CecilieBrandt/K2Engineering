@@ -170,7 +170,7 @@ namespace K2Engineering
                 Plane pl = new Plane(P1, planeXAxis, planeYAxis);
 
                 //Create rod data object to store output information
-                DataTypes.RodData rodData = new DataTypes.RodData(PIndex[1], pl, moment * 1e-6, bendingStress);
+                DataTypes.RodData rodData = new DataTypes.RodData(pl, moment * 1e-6, bendingStress);
                 return rodData;
             }
 

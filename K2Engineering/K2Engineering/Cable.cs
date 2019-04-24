@@ -120,7 +120,7 @@ namespace K2Engineering
                 double force = Weighting[0] * Move[0].Length;
 
                 //Create bar data object to store output information
-                DataTypes.BarData barData = new DataTypes.BarData(PIndex[0], PIndex[1], new Line(p[PIndex[0]].Position, p[PIndex[1]].Position), force / 1000.0, force / area);
+                DataTypes.BarData barData = new DataTypes.BarData(new Line(p[PIndex[0]].Position, p[PIndex[1]].Position), force / 1000.0, force / area);
                 
                 return barData;
             }
