@@ -23,7 +23,7 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddLineParameter("Bars", "bars", "Bar elements. Make sure that the Rhino model is set to units in [m]", GH_ParamAccess.list);
+            pManager.AddLineParameter("Bars", "bars", "Bar elements in [m]", GH_ParamAccess.list);
         }
 
         /// <summary>
@@ -47,8 +47,9 @@ namespace K2Engineering
 
 
             //Calculate
-            Point3d[] nodes = extractNodes(bars);
-            double[] nodalLengths = calcNodalLengths(bars, nodes);
+            double tol = 0.001;                                             //Model in meters so tolerance is 1 mm
+            Point3d[] nodes = extractNodes(bars, tol);
+            double[] nodalLengths = calcNodalLengths(bars, nodes, tol);
 
 
             //Output
@@ -61,11 +62,8 @@ namespace K2Engineering
         //Methods
 
         //Calculate lengths coming into each node
-        double[] calcNodalLengths(List<Line> bars, Point3d[] nodes)
+        double[] calcNodalLengths(List<Line> bars, Point3d[] nodes, double tol)
         {
-            bool isMeters = isModelMeters();
-            Point3d[] nodesAdjusted = adjustNodeAccuracy(nodes); 
-
             double[] nodalLengths = new double[nodes.Length];
             
             //Initialise length array
@@ -75,47 +73,29 @@ namespace K2Engineering
             }
 
             //Add half lengths from each incoming bar
-            int count = 0;
+            
             foreach (Line ln in bars)
             {
-                //Round
-                double xStart = Math.Round(ln.FromX, 3);
-                double yStart = Math.Round(ln.FromY, 3);
-                double zStart = Math.Round(ln.FromZ, 3);
+                Point3d ptStart = ln.From;
+                Point3d ptEnd = ln.To;
+                double length = ln.Length * 0.5;
 
-                double xEnd = Math.Round(ln.ToX, 3);
-                double yEnd = Math.Round(ln.ToY, 3);
-                double zEnd = Math.Round(ln.ToZ, 3);
-
-                if (!isMeters)
+                int count = 0;
+                for (int i=0; i<nodes.Length; i++)
                 {
-                    xStart = Convert.ToInt32(xStart);
-                    yStart = Convert.ToInt32(yStart);
-                    zStart = Convert.ToInt32(zStart);
+                    Point3d pt = nodes[i];
 
-                    xEnd = Convert.ToInt32(xEnd);
-                    yEnd = Convert.ToInt32(yEnd);
-                    zEnd = Convert.ToInt32(zEnd);
+                    if(ptStart.DistanceTo(pt) <= tol || ptEnd.DistanceTo(pt) <= tol)
+                    {
+                        nodalLengths[i] += length;
+                        count++;
+                    }
+
+                    if(count == 2)
+                    {
+                        break;
+                    }
                 }
-
-                Point3d ptStartA = new Point3d(xStart, yStart, zStart);
-                Point3d ptEndA = new Point3d(xEnd, yEnd, zEnd);
-
-                int indexStart = Array.IndexOf(nodesAdjusted, ptStartA);
-                int indexEnd = Array.IndexOf(nodesAdjusted, ptEndA);
-
-                if(indexStart == -1 || indexEnd == -1)
-                {
-                    this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Not able to find start/end index of line " + count);
-                }
-
-                Vector3d edge = new Vector3d(ln.To - ln.From);
-                double length = edge.Length * 0.5;
-
-                nodalLengths[indexStart] += length;
-                nodalLengths[indexEnd] += length;
-
-                count++;
             }
 
             return nodalLengths;
@@ -123,7 +103,7 @@ namespace K2Engineering
 
 
         //Create a list of points from bar elements (remove duplicates)
-        Point3d[] extractNodes(List<Line> bars)
+        Point3d[] extractNodes(List<Line> bars, double tol)
         {
             //Create a list of all points
             List<Point3d> nodesAll = new List<Point3d>();
@@ -134,56 +114,10 @@ namespace K2Engineering
             }
 
             //Cull duplicates
-            Point3d[] nodes = Point3d.CullDuplicates(nodesAll, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+            Point3d[] nodes = Point3d.CullDuplicates(nodesAll, tol);
 
             return nodes;
         }
-
-
-        //Determine if model scale is in Meters
-        bool isModelMeters()
-        {
-            bool isMeters = false;
-
-            UnitSystem us = RhinoDoc.ActiveDoc.ModelUnitSystem;
-            String unit = us.ToString();
-            if (unit.Equals("Meters"))
-            {
-                isMeters = true;
-            }
-
-            return isMeters;
-        }
-
-
-        //Create a list of points with accuracy according to model units
-        Point3d[] adjustNodeAccuracy(Point3d [] nodesOriginal)
-        {
-            bool isMeters = isModelMeters();
-
-            //Create a list of all points with adjusted accuracy
-            Point3d[] ptsAdjusted = new Point3d[nodesOriginal.Length];
-            for (int i=0; i<nodesOriginal.Length; i++)
-            {
-                double x = Math.Round(nodesOriginal[i].X, 3);
-                double y = Math.Round(nodesOriginal[i].Y, 3);
-                double z = Math.Round(nodesOriginal[i].Z, 3);
-
-                if (!isMeters)
-                {
-                    x = Convert.ToInt32(x);
-                    y = Convert.ToInt32(y);
-                    z = Convert.ToInt32(z);
-                }
-
-                ptsAdjusted[i] = new Point3d(x, y, z);
-            }
-
-            return ptsAdjusted;
-        }
-
-
-
 
 
         /// <summary>
