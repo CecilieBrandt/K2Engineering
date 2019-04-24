@@ -61,7 +61,7 @@ namespace K2Engineering
             double a = calcArea(w, h, t);
             double iy = calcInertia(w, h, t);
             double iz = calcInertia(h, w, t);
-            double it = iy + iz;
+            double it = calcTorsionalInertia(w, h, t);
 
 
             //Output
@@ -99,6 +99,33 @@ namespace K2Engineering
             }
 
             return inertia;
+        }
+
+        //Calculate torsional moment of inertia
+        double calcTorsionalInertia(double w, double h, double t)
+        {
+            double a = h;
+            double b = w;
+
+            if (w > h)
+            {
+                a = w;
+                b = h;
+            }
+
+            double inertiaT = 0.0;
+
+            if (t == 0.0)
+            {
+                inertiaT = a * Math.Pow(b, 3) * (1.0 / 3.0 - 0.21 * b / a * (1 - Math.Pow(b, 4) / (12 * Math.Pow(a, 4))));
+            }
+
+            else
+            {
+                inertiaT = (2 * Math.Pow(t,2) * Math.Pow((a-2),2) * Math.Pow((b-t),2) ) / (a*t + b*t - 2*Math.Pow(t,2));
+            }
+
+            return inertiaT;
         }
 
 

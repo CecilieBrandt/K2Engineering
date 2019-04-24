@@ -108,12 +108,12 @@ namespace K2Engineering
             double stressRange = maxStress - minStress;
 
             //Remap stress values to line widths if the stress range is not constant
-            int widthMin = 1;
+            int widthMin = 2;
             int widthMax = tmax;
 
             foreach (int s in stressesInt)
             {
-                int tMap = 2;       //default thickness in case of constant stress values
+                int tMap = widthMin;       //default thickness in case of constant stress values
 
                 if (stressRange != 0.0)
                 {
