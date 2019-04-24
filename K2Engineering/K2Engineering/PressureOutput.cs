@@ -13,7 +13,7 @@ namespace K2Engineering
         public PressureOutput()
           : base("PressureOutput", "PressureOutput",
               "Extract the output of the pressure goal",
-              "K2Eng", "6 Utility")
+              "K2Eng", "3 Results")
         {
         }
 

@@ -14,7 +14,7 @@ namespace K2Engineering
         public RodOutput()
           : base("RodOutput", "RodOutput",
               "Extract the output of the Rod goal",
-              "K2Eng", "6 Utility")
+              "K2Eng", "3 Results")
         {
         }
 

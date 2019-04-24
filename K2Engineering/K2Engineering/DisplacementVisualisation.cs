@@ -20,7 +20,7 @@ namespace K2Engineering
         public DisplacementVisualisation()
           : base("DisplacementVisualisation", "DisplVis",
               "Visualise the nodal displacements by colouring the connected bars",
-              "K2Eng", "5 Display")
+              "K2Eng", "4 Display")
         {
         }
 

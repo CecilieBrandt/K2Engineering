@@ -14,7 +14,7 @@ namespace K2Engineering
         public BeamOrientation()
           : base("BeamOrientation", "BeamOrientation",
               "Compute the start and end plane orientation of a beam element",
-              "K2Eng", "6 Utility")
+              "K2Eng", "5 Utility")
         {
         }
 

@@ -15,7 +15,7 @@ namespace K2Engineering
         public Pretension()
           : base("Pretension", "PT",
               "Calculate pretension distribution in a cablenet",
-              "K2Eng", "6 Utility")
+              "K2Eng", "5 Utility")
         {
         }
 

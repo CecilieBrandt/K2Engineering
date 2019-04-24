@@ -21,7 +21,7 @@ namespace K2Engineering
         public ShearVisualisation()
           : base("ShearVisualisation", "ShearDisplay",
               "Visualise the shear forces with colour (blue=low, green=medium, red=high)",
-              "K2Eng", "5 Display")
+              "K2Eng", "4 Display")
         {
         }
 

@@ -14,7 +14,7 @@ namespace K2Engineering
         public Displacements()
           : base("Displacements", "Displ",
               "Calculate the nodal displacements",
-              "K2Eng", "4 Results")
+              "K2Eng", "3 Results")
         {
         }
 

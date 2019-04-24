@@ -20,7 +20,7 @@ namespace K2Engineering
         public BendingVisualisation6DOF()
           : base("BendingVisualisation6DOF", "BendingDisplay",
               "Visualise the 6 DOF beam forces/moments",
-              "K2Eng", "5 Display")
+              "K2Eng", "4 Display")
         {
         }
 

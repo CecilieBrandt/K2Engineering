@@ -14,7 +14,7 @@ namespace K2Engineering
         public LoadOutput()
           : base("LoadOutput", "LoadOutput",
               "Extract the output of the Load goal",
-              "K2Eng", "6 Utility")
+              "K2Eng", "3 Results")
         {
         }
 

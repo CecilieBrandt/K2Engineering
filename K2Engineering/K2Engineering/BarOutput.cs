@@ -14,7 +14,7 @@ namespace K2Engineering
         public BarOutput()
           : base("BarOutput", "BarOutput",
               "Extract the output of the Bar goal",
-              "K2Eng", "6 Utility")
+              "K2Eng", "3 Results")
         {
         }
 

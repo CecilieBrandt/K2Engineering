@@ -14,7 +14,7 @@ namespace K2Engineering
         public TransformMoment()
           : base("TransformMoment", "TransformMoment",
               "Transform a moment from one horizontal plane (XY) to another",
-              "K2Eng", "6 Utility")
+              "K2Eng", "5 Utility")
         {
         }
 

@@ -16,7 +16,7 @@ namespace K2Engineering
         public BucklingAnalysis()
           : base("BucklingAnalysis", "Buckling",
               "Calculate the buckling load factor from a nonlinear load-displacement analysis",
-              "K2Eng", "3 Analysis")
+              "K2Eng", "3 Results")
         {
         }
 

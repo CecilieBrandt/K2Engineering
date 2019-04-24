@@ -14,7 +14,7 @@ namespace K2Engineering
         public SupportOutput()
           : base("SupportOutput", "SupportOutput",
               "Extract the output of the Support goal",
-              "K2Eng", "6 Utility")
+              "K2Eng", "3 Results")
         {
         }
 

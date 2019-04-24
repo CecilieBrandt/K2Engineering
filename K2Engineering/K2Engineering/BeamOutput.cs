@@ -14,7 +14,7 @@ namespace K2Engineering
         public BeamOutput()
           : base("BeamOutput", "BeamOutput",
               "Extract the output of the Beam goal",
-              "K2Eng", "6 Utility")
+              "K2Eng", "3 Results")
         {
         }
 

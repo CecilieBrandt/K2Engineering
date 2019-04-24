@@ -14,7 +14,7 @@ namespace K2Engineering
         public Support6DOFOutput()
           : base("Support6DOFOutput", "Support6DOFOutput",
               "Extract the output of the 6 DOF Support goal",
-              "K2Eng", "6 Utility")
+              "K2Eng", "3 Results")
         {
         }
 
