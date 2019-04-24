@@ -145,19 +145,15 @@ namespace K2Engineering
 
 
         //-----------------------------------------CALCULATE THE ASSOCIATED VERTEX AREA FOR AN OBTUSE FACE-------------------------------------------//
-        public double calcObtuseVertexArea(bool isVertexObtuse, Vector3d faceNormal, bool proj)
+        public double calcObtuseVertexArea(bool isVertexObtuse, Vector3d faceNormal, Plane plnProj)
         {
             double faceArea = faceNormal.Length;
+            double areaFactor = 1.0;
 
-            if (proj)
+            if (plnProj.IsValid)
             {
                 faceNormal.Unitize();
-                double dotProduct = Vector3d.Multiply(faceNormal, Vector3d.ZAxis);
-
-                if(dotProduct <= 0.0)
-                {
-                    faceArea = 0.0;
-                }
+                areaFactor = Math.Abs(Vector3d.Multiply(faceNormal, plnProj.Normal));
             }
 
             double vertexArea = faceArea / 4.0;
@@ -165,6 +161,8 @@ namespace K2Engineering
             {
                 vertexArea = faceArea / 2.0;
             }
+
+            vertexArea *= areaFactor;
 
             return vertexArea;
         }
@@ -204,7 +202,7 @@ namespace K2Engineering
 
 
         //-----------------------------------------CALCULATE THE ASSOCIATED VERTEX AREA FOR A NON-OBTUSE FACE-------------------------------------------//
-        public double calcNonObtuseVertexArea(int vertexIndex, int faceIndex, Vector3d faceNormal, bool proj)
+        public double calcNonObtuseVertexArea(int vertexIndex, int faceIndex, Vector3d faceNormal, Plane plnProj)
         {
             Line PR;
             Line PQ;
@@ -213,17 +211,15 @@ namespace K2Engineering
             extractNonObtuseData(vertexIndex, faceIndex, out PR, out PQ, out angleR, out angleQ);
 
             double vertexArea = (1 / 8.0) * ((Math.Pow(PR.Length, 2) * (1 / Math.Tan(angleQ))) + (Math.Pow(PQ.Length, 2) * (1 / Math.Tan(angleR))));
+            double areaFactor = 1.0;
 
-            if (proj)
+            if (plnProj.IsValid)
             {
                 faceNormal.Unitize();
-                double dotProduct = Vector3d.Multiply(faceNormal, Vector3d.ZAxis);
-
-                if(dotProduct <= 0.0)
-                {
-                    vertexArea = 0.0;
-                } 
+                areaFactor = Math.Abs(Vector3d.Multiply(faceNormal, plnProj.Normal));
             }
+
+            vertexArea *= areaFactor;
 
             return vertexArea;
         }
@@ -231,7 +227,7 @@ namespace K2Engineering
 
 
         //-----------------------------------------CALCULATE THE VERTEX VORONOI AREA-------------------------------------------//
-        public Vector3d calcVertexVoronoiArea(int vertexIndex, bool proj)
+        public Vector3d calcVertexVoronoiArea(int vertexIndex, Plane plnProj)
         {
             int[] vertexFaces = this.Vertices.GetVertexFaces(vertexIndex);
 
@@ -265,11 +261,11 @@ namespace K2Engineering
                             isVertexObtuse = true;
                         }
 
-                        vertexVoronoiArea += calcObtuseVertexArea(isVertexObtuse, faceNormals[j], proj);
+                        vertexVoronoiArea += calcObtuseVertexArea(isVertexObtuse, faceNormals[j], plnProj);
                     }
                     else
                     {
-                        vertexVoronoiArea += calcNonObtuseVertexArea(vertexIndex, vertexFaces[j], faceNormals[j], proj);
+                        vertexVoronoiArea += calcNonObtuseVertexArea(vertexIndex, vertexFaces[j], faceNormals[j], plnProj);
                     }
                 } 
             }
@@ -283,13 +279,13 @@ namespace K2Engineering
 
 
         //-----------------------------------------CALCULATE THE VERTEX VORONOI AREAS (ALL)-------------------------------------------//
-        public Vector3d[] calcVertexVoronoiAreas(bool proj)
+        public Vector3d[] calcVertexVoronoiAreas(Plane plnProj)
         {
             Vector3d[] vertexAreas = new Vector3d[this.Vertices.Count];
 
             for(int i=0; i<this.Vertices.Count; i++)
             {
-                vertexAreas[i] = calcVertexVoronoiArea(i, proj);
+                vertexAreas[i] = calcVertexVoronoiArea(i, plnProj);
             }
 
             return vertexAreas;
@@ -339,6 +335,7 @@ namespace K2Engineering
 
 
         //-----------------------------------------CREATE PMESH PROJECTED TO XY PLANE-------------------------------------------//
+        /*
         public PMeshExt projectMeshToXY()
         {
             PMeshExt pMeshE = new PMeshExt(this);
@@ -350,7 +347,7 @@ namespace K2Engineering
 
             return pMeshE;
         }
-
+        */
 
 
     }

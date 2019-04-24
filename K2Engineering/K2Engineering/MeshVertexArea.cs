@@ -24,8 +24,9 @@ namespace K2Engineering
         /// </summary>
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
-            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A PlanktonMesh", GH_ParamAccess.item);
-            pManager.AddBooleanParameter("ProjectToXY", "proj", "Project the mesh faces to the XY plane (useful for e.g. snow load calculation)", GH_ParamAccess.item, false);
+            pManager.AddGenericParameter("PlanktonMesh", "pMesh", "A triangulated PlanktonMesh", GH_ParamAccess.item);
+            pManager.AddPlaneParameter("ProjectToPlane", "pln", "Optional - project the mesh face areas to a plane", GH_ParamAccess.item);
+            pManager[1].Optional = true;
         }
 
         /// <summary>
@@ -47,8 +48,8 @@ namespace K2Engineering
             PlanktonMesh pMesh = new PlanktonMesh();
             DA.GetData(0, ref pMesh);
 
-            bool projXY = false;
-            DA.GetData(1, ref projXY);
+            Plane pln = new Plane();
+            DA.GetData(1, ref pln);
 
 
 
@@ -60,16 +61,9 @@ namespace K2Engineering
                 this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The mesh has to be triangulated");
             }
 
-            //Extract vertices from initial 3d pMesh
             Point3d[] verticesXYZ = pMeshE.convertVerticesToXYZ();
 
-            //If projected then create new pMesh
-            if (projXY)
-            {
-                pMeshE = pMeshE.projectMeshToXY();
-            }
-
-            Vector3d[] vertexAreas = pMeshE.calcVertexVoronoiAreas(projXY);
+            Vector3d[] vertexAreas = pMeshE.calcVertexVoronoiAreas(pln);
 
 
 

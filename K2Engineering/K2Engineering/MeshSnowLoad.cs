@@ -24,7 +24,8 @@ namespace K2Engineering
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddVectorParameter("Snow", "S", "The snow load as a vector indicating direction and magnitude [kN/m2]", GH_ParamAccess.item);
-            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area (projected) [m2]", GH_ParamAccess.list);
+            pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area [m2]", GH_ParamAccess.list);
+            pManager.AddBooleanParameter("Option", "opt", "If true, the nodal load is set to zero if the normal is pointing downwards", GH_ParamAccess.item, true);
         }
 
         /// <summary>
@@ -48,9 +49,12 @@ namespace K2Engineering
             List<Vector3d> vertexNormals = new List<Vector3d>();
             DA.GetDataList(1, vertexNormals);
 
+            bool opt = true;
+            DA.GetData(2, ref opt);
+
 
             //Calculate
-            List<Vector3d> nodalLoads = calcNodalSnowLoads(vertexNormals, snow);
+            List<Vector3d> nodalLoads = calcNodalSnowLoads(vertexNormals, snow, opt);
 
 
             //Output
@@ -61,14 +65,24 @@ namespace K2Engineering
         //Methods
 
         //Calculate nodal snow loads
-        List<Vector3d> calcNodalSnowLoads(List<Vector3d> vertexNormals, Vector3d snow)
+        List<Vector3d> calcNodalSnowLoads(List<Vector3d> vertexNormals, Vector3d snow, bool opt)
         {
             List<Vector3d> nodalLoads = new List<Vector3d>();
 
             for (int i = 0; i < vertexNormals.Count; i++)
             {
-                double vertexArea = vertexNormals[i].Length;                //m2
-                Vector3d force = snow * vertexArea * 1e3;                   //N
+                Vector3d vN = vertexNormals[i];
+                double vertexArea = vN.Length;                //m2
+                vN.Unitize();
+
+                double dot = Vector3d.Multiply(vN, Vector3d.ZAxis);
+
+                Vector3d force = new Vector3d(0, 0, 0);
+                if(dot >= 0.0)
+                {
+                    force = snow * vertexArea * 1e3;                   //N
+                }
+
                 nodalLoads.Add(force);
             }
 

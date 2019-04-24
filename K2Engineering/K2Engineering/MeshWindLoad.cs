@@ -13,7 +13,7 @@ namespace K2Engineering
         /// </summary>
         public MeshWindLoad()
           : base("MeshWindLoad", "MWind",
-              "Calculate a simplified wind load on a mesh",
+              "Calculate wind load on a mesh",
               "K2Eng", "2 Load")
         {
         }
@@ -25,7 +25,7 @@ namespace K2Engineering
         {
             pManager.AddVectorParameter("Wind", "W", "The wind load as a vector indicating direction and magnitude [kN/m2]", GH_ParamAccess.item);
             pManager.AddVectorParameter("VertexNormals", "nA", "The vertex normals scaled according to the associated voronoi area [m2]", GH_ParamAccess.list);
-            pManager.AddBooleanParameter("ScaleOption", "opt", "If true, the force in each vertex is scaled according to its projection onto the wind direction. If false, only the sign is used to determine pressure/suction", GH_ParamAccess.item, true);
+            pManager.AddBooleanParameter("Option", "opt", "True: normal direction (pressure/suction). False: constant direction parallel to load vector", GH_ParamAccess.item, true);
         }
 
         /// <summary>
@@ -49,12 +49,12 @@ namespace K2Engineering
             List<Vector3d> vertexNormals = new List<Vector3d>();
             DA.GetDataList(1, vertexNormals);
 
-            bool scale = true;
-            DA.GetData(2, ref scale);
+            bool opt = true;
+            DA.GetData(2, ref opt);
 
 
             //Calculate
-            List<Vector3d> nodalLoads = calcNodalWindLoads(vertexNormals, wind, scale);
+            List<Vector3d> nodalLoads = calcNodalWindLoads(vertexNormals, wind, opt);
 
 
             //Output
@@ -64,7 +64,7 @@ namespace K2Engineering
 
         //Methods
 
-        List<Vector3d> calcNodalWindLoads(List<Vector3d> vertexNormals, Vector3d wind, bool scale)
+        List<Vector3d> calcNodalWindLoads(List<Vector3d> vertexNormals, Vector3d wind, bool opt)
         {
             List<Vector3d> windload = new List<Vector3d>();
 
@@ -74,24 +74,31 @@ namespace K2Engineering
 
             for(int i=0; i<vertexNormals.Count; i++)
             {
-                //Calculate projection onto wind direction
                 Vector3d vN = vertexNormals[i];
                 double vertexArea = vN.Length;                      //m2
                 vN.Unitize();
 
-                double dotProduct = Vector3d.Multiply(vN, wDir);
-
                 //Calculate wind force
-                Vector3d force = vN * vertexArea * w * 1e3;         //N
+                double forceMagnitude = vertexArea * w * 1e3;         //N
+                Vector3d force = new Vector3d();
 
-                if(dotProduct < 0.0)
+                if (opt == true)
                 {
-                    force.Reverse();
+                    force = vN * forceMagnitude;
+
+                    double dotProduct = Vector3d.Multiply(vN, wDir);
+
+                    if (dotProduct < 0.0)
+                    {
+                        force.Reverse();
+                    }
                 }
 
-                if (scale)
+                else
                 {
-                    force *= Math.Abs(dotProduct);
+                    Vector3d forceDir = new Vector3d(wind);
+                    forceDir.Unitize();
+                    force = forceDir * forceMagnitude;
                 }
 
                 windload.Add(force);
