@@ -82,7 +82,7 @@ namespace K2Engineering
                 double forceMagnitude = vertexArea * w * 1e3;         //N
                 Vector3d force = new Vector3d();
 
-                if (opt == true)
+                if (opt)
                 {
                     force = vN * forceMagnitude;
 

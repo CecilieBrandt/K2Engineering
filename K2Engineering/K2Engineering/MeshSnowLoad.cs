@@ -72,15 +72,18 @@ namespace K2Engineering
             for (int i = 0; i < vertexNormals.Count; i++)
             {
                 Vector3d vN = vertexNormals[i];
-                double vertexArea = vN.Length;                //m2
+                double vertexArea = vN.Length;                                      //m2
                 vN.Unitize();
 
-                double dot = Vector3d.Multiply(vN, Vector3d.ZAxis);
+                Vector3d force = snow * vertexArea * 1e3;                   //N
 
-                Vector3d force = new Vector3d(0, 0, 0);
-                if(dot >= 0.0)
+                if (opt)
                 {
-                    force = snow * vertexArea * 1e3;                   //N
+                    double dot = Vector3d.Multiply(vN, Vector3d.ZAxis);
+                    if (dot < 0.0)
+                    {
+                        force = new Vector3d(0, 0, 0);
+                    }
                 }
 
                 nodalLoads.Add(force);
