@@ -114,21 +114,21 @@ namespace K2Engineering
                 int axialDigits = axialStiffness.ToString().Split('.')[0].Length;
 
                 double bendingStiffness = E * Math.Max(Iy, Iz);
-                bendingStiffness *= 0.001;                                                   //Still needs some adjustment to achieve acceptable convergence speed
+                bendingStiffness *= 0.001;                                                   //Still needs some adjustment to improve convergence speed
                 int bendingDigits = bendingStiffness.ToString().Split('.')[0].Length;
 
 
                 //K2 properties
                 PPos = new Point3d[2] {startPlane.Origin, endPlane.Origin};
                 Move = new Vector3d[2];
-                Weighting = new double[2] { Math.Pow(10, axialDigits), Math.Pow(10, axialDigits) };           
+                Weighting = new double[2] { Math.Pow(10, axialDigits), Math.Pow(10, axialDigits) };
 
                 Torque = new Vector3d[2];
                 TorqueWeighting = new double[2] { Math.Pow(10, bendingDigits), Math.Pow(10, bendingDigits) };
 
                 Plane startGlobal = new Plane(startPlane.Origin, Vector3d.XAxis, Vector3d.YAxis);
                 Plane endGlobal = new Plane(endPlane.Origin, Vector3d.XAxis, Vector3d.YAxis);
-                InitialOrientation = new Plane[2] { startGlobal, endGlobal };       //Needs to be global because the calculated forces and rotations in nodes are calculated globally
+                InitialOrientation = new Plane[2] { startGlobal, endGlobal };
 
 
                 //Local end planes
