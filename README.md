@@ -7,13 +7,15 @@ This plugin contains a set of customised Kangaroo2 grasshopper components with t
 This is particularly useful for the analysis of form-active structures (including cablenets and gridshells) that are typically characterised by their large deformations when subjected to external loads. The underlying position-based dynamics implemented in the Kangaroo2 solver inherently deals with this non-linear behaviour. This means that both form-finding and analysis can be performed within the Grasshopper environment using K2 and K2Engineering.
 
 
-Dependencies
+Installation
 ============
-Install the following plugins:
+Download the latest .gha file under [releases](https://github.com/CecilieBrandt/K2Engineering/releases), unblock it and place it in your Grasshopper library folder: C:\Users\XX\AppData\Roaming\Grasshopper\Libraries
 
-[Kangaroo2](http://www.food4rhino.com/app/kangaroo-physics) 
+K2Engineering has the following dependencies:
 
-[Plankton](https://github.com/meshmash/Plankton/releases)
+[Kangaroo2](https://github.com/Dan-Piker/K2Goals): Kangaroo2 is a native part of Rhino 6 so it is automatically installed. You will most likely find it in this location: C:\Program Files\Rhino 6\Plug-ins\Grasshopper\Components
+
+[Plankton](https://github.com/meshmash/Plankton/releases): Plankton is a halfedge mesh library and has to be installed manually. Download the latest dll and .gha files from the link, unblock them and place them in your Grasshopper library folder: C:\Users\XX\AppData\Roaming\Grasshopper\Libraries
 
 
 Disclaimer
