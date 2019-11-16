@@ -7,7 +7,7 @@ using Rhino.Geometry;
 
 namespace K2Engineering.DataTypes
 {
-    class Support6DOFData
+    public class Support6DOFData
     {
         public Plane Pln;
         public Vector3d ReactionForce;

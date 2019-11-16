@@ -7,7 +7,7 @@ using Rhino.Geometry;
 
 namespace K2Engineering.DataTypes
 {
-    class SupportData
+    public class SupportData
     {
         public Point3d Location;
         public Vector3d Reaction;

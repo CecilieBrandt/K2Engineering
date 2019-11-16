@@ -7,7 +7,7 @@ using Rhino.Geometry;
 
 namespace K2Engineering.DataTypes
 {
-    class RodData
+    public class RodData
     {
         public Plane BendingPlane;
         public double Moment;
