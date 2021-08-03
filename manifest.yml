@@ -1,0 +1,8 @@
+---
+name: K2Engineering
+version: $version
+authors:
+- Cecilie Brandt-Olsen
+description: This plugin contains a set of customised Kangaroo2 grasshopper components with the scope of calibrating a number of goals with regard to structural properties.
+license: Apache 2
+url: https://github.com/CecilieBrandt/K2Engineering
